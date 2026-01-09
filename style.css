@@ -376,6 +376,7 @@ section {
     width: 100%;
     position: absolute;
     bottom: 0;
+    transform: translateX(0);
     transition: 1s;
 
     .car {
@@ -385,8 +386,10 @@ section {
       right: 0;
       bottom: 0;
       width: 100%;
+      transform: translateY(0%);
 
-      img {
+      img,
+      video {
         width: 100%;
         height: auto;
       }
@@ -403,7 +406,8 @@ section {
       overflow: hidden;
       transition: 1s;
 
-      img {
+      img,
+      video {
         width: 100%;
       }
     }
@@ -411,10 +415,16 @@ section {
 
   .s2 .main-car {
     transform: translateX(-16.66666667%);
+
+    .car {
+      transform: translateY(-6%);
+    }
     .light-circle {
-      left: 25%;
-      right: 25%;
-      width: 50%;
+      --inset-inline: 20%;
+      transform: translateY(0%);
+      left: var(--inset-inline);
+      right: var(--inset-inline);
+      width: calc(100% - var(--inset-inline) * 2);
     }
   }
 }
