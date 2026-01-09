@@ -189,8 +189,8 @@ section {
       gap: 4vmin;
 
       .pic {
-        width: 16.66666667vmin;
-        height: 16.66666667vmin;
+        width: 16.66666667vw;
+        height: 16.66666667vw;
 
         img {
           width: 100%;
@@ -202,7 +202,7 @@ section {
   }
 
   .container-listens,
-  .container-multiple-zones {
+  .container-can-feel {
     .other-info {
       position: absolute;
       top: 50%;
@@ -225,7 +225,7 @@ section {
   }
 
   .container-understands,
-  .container-dp {
+  .container-multiple-zones {
     .other-info {
       position: absolute;
       top: 23%;
@@ -237,8 +237,8 @@ section {
       gap: 16vw;
 
       .pic {
-        width: 17.55208333vmin;
-        height: 17.55208333vmin;
+        width: 17.55208333vw;
+        height: 17.55208333vw;
 
         img {
           width: 100%;
@@ -246,6 +246,12 @@ section {
           object-fit: contain;
         }
       }
+    }
+  }
+
+  .container-Engineered {
+    .tag {
+      border-left-color: #fff;
     }
   }
 }
