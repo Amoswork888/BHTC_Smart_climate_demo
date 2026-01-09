@@ -2,7 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "roboto", "Arial", sans-serif;
+  font-family: roboto, "Arial", sans-serif;
 }
 :root {
   --title-txt-size: 3.333333vw;
@@ -70,6 +70,74 @@ section {
   color: var(--slogan-color);
   text-align: center;
   background-color: #82aeb9;
+}
+
+/* 小車清單 */
+.car-list {
+  position: absolute;
+  width: 100%;
+  top: 15vw;
+  left: 0;
+  right: 0;
+  display: flex;
+
+  img {
+    width: 100%;
+  }
+
+  .car-item {
+    position: relative;
+
+    img {
+      position: relative;
+      z-index: 1;
+    }
+
+    .txt {
+      position: absolute;
+      top: 16%;
+      font-size: 2.5vw;
+      font-weight: 300;
+      color: #fff;
+    }
+  }
+
+  .car-item:nth-child(1) {
+    transform: translate(40%, 70%);
+    .txt {
+      right: 40%;
+    }
+  }
+  .car-item:nth-child(2) {
+    transform: translate(0, 20%);
+    .txt {
+      left: 0;
+    }
+  }
+  .car-item:nth-child(3) {
+    transform: translate();
+    .txt {
+      left: 0;
+    }
+  }
+  .car-item:nth-child(4) {
+    transform: translate();
+    .txt {
+      right: 0;
+    }
+  }
+  .car-item:nth-child(5) {
+    transform: translate(0, 20%);
+    .txt {
+      right: 0;
+    }
+  }
+  .car-item:nth-child(6) {
+    transform: translate(-40%, 70%);
+    .txt {
+      right: 0;
+    }
+  }
 }
 
 /* Part1 ==================================================== */
@@ -252,6 +320,83 @@ section {
   .container-Engineered {
     .tag {
       border-left-color: #fff;
+    }
+  }
+}
+
+/* .Part1 content ======================== */
+.section-part1 {
+  .main-title {
+    .title-topic {
+      position: absolute;
+      width: 100%;
+      opacity: 0;
+    }
+  }
+  .s1 {
+    .topic1 {
+      opacity: 1;
+    }
+  }
+  .s2 {
+    .topic2 {
+      opacity: 1;
+    }
+  }
+  .s3 {
+    .topic3 {
+      opacity: 1;
+    }
+  }
+  .s4 {
+    .topic4 {
+      opacity: 1;
+    }
+  }
+  .s5 {
+    .topic5 {
+      opacity: 1;
+    }
+  }
+  .s6 {
+    .topic6 {
+      opacity: 1;
+    }
+  }
+
+  .main-car {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    .car {
+      position: absolute;
+      z-index: 4;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      outline: 1px solid red;
+
+      img {
+        width: 100%;
+        height: auto;
+      }
+    }
+
+    .light-circle {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      transform: translateY(-6%);
+      width: 100%;
+      mix-blend-mode: screen;
+      overflow: hidden;
+      outline: 1px solid blue;
+
+      img {
+        width: 100%;
+      }
     }
   }
 }
