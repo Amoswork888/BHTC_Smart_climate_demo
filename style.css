@@ -375,6 +375,7 @@ section {
   .main-car {
     width: 100%;
     position: absolute;
+    z-index: 5;
     bottom: 0;
     transform: translateX(0);
     transition: 1s;
@@ -396,9 +397,10 @@ section {
     }
 
     .light-circle {
+      --inset-inline: 0;
       position: absolute;
-      left: 0;
-      right: 0;
+      left: var(--inset-inline);
+      right: var(--inset-inline);
       bottom: 0;
       transform: translateY(-6%);
       width: 100%;
@@ -422,9 +424,114 @@ section {
     .light-circle {
       --inset-inline: 20%;
       transform: translateY(0%);
-      left: var(--inset-inline);
-      right: var(--inset-inline);
       width: calc(100% - var(--inset-inline) * 2);
+    }
+  }
+  .s6 .main-car {
+    transform: translateX(0%);
+    .car {
+      transform: translateY(-6%);
+    }
+    .light-circle {
+      --inset-inline: 20%;
+      transform: translateY(0%);
+      width: calc(100% - var(--inset-inline) * 2);
+    }
+  }
+
+  .function,
+  .component-check {
+    width: 26.875vw;
+    position: absolute;
+    top: 50vw;
+    right: 8.333333%;
+    transform: translateY(-50%);
+
+    .function-list,
+    .component-check-list {
+      li {
+        display: flex;
+        align-items: center;
+        list-style: none;
+        gap: 0.5vw;
+        padding-block: 2ex;
+        padding-inline: 1em;
+
+        &:not(:first-child) {
+          border-top: 1px solid #fff;
+        }
+
+        &[disabled] {
+          opacity: 0.5;
+        }
+
+        .function-list-icon {
+          img {
+            width: 5vw;
+          }
+        }
+        .function-list-txt {
+          color: #fff;
+          width: 0;
+          flex-grow: 1;
+          font-size: 1.875vw;
+        }
+        .function-list-check {
+          width: 4vw;
+          color: #fff;
+          font-size: 1.875vw;
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  .component-list {
+    position: absolute;
+    z-index: 3;
+    left: 12vw;
+    top: 24vw;
+    display: flex;
+    gap: 1vw;
+
+    .item {
+      width: 7.70833333vw;
+      img {
+        width: 100%;
+      }
+
+      &:nth-child(2),
+      &:nth-child(4) {
+        transform: translateY(14%);
+      }
+
+      &:nth-child(1) {
+        transform: translateX(12%) translateY(70%);
+      }
+      &:nth-child(5) {
+        transform: translateX(-12%) translateY(70%);
+      }
+    }
+  }
+
+  /* 三顆泡泡 */
+  .intelligence-bubble {
+    position: absolute;
+    z-index: 3;
+    left: 0;
+    right: 0;
+    top: 21vw;
+    display: flex;
+    justify-content: center;
+    gap: 1vw;
+
+    .bubble {
+      &:nth-child(odd) {
+        transform: translateY(30%);
+      }
+      img {
+        width: 100%;
+      }
     }
   }
 }
