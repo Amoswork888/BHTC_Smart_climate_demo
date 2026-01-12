@@ -83,6 +83,7 @@ section {
 /* 小車清單 ==================================================== */
 .car-list {
   position: absolute;
+  z-index: 5;
   width: 100%;
   top: 15vw;
   left: 0;
