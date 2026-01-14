@@ -648,6 +648,7 @@ section {
   .s6 .intelligence-bubble {
     .bubble {
       opacity: 1;
+      transition-delay: 1.5s;
     }
   }
 }
