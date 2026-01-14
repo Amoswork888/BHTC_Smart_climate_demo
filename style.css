@@ -79,9 +79,18 @@ section {
   text-align: center;
   background-color: #82aeb9;
 }
+.section-part1 .container:first-child {
+  position: sticky;
+  top: 0;
+}
+.section-part1 .container:last-child {
+  position: absolute;
+  bottom: 0;
+}
 
 /* 小車清單 ==================================================== */
 .car-list {
+  opacity: 1;
   position: absolute;
   z-index: 5;
   width: 100%;
@@ -89,6 +98,7 @@ section {
   left: 0;
   right: 0;
   display: flex;
+  justify-content: center;
 
   img {
     width: 100%;
@@ -98,11 +108,13 @@ section {
     position: relative;
 
     img {
+      opacity: 0;
       position: relative;
       z-index: 1;
     }
 
     .txt {
+      opacity: 0;
       position: absolute;
       top: 16%;
       font-size: 2.5vw;
@@ -110,7 +122,7 @@ section {
       color: #fff;
     }
   }
-
+  /* 小汽車位置偏移 */
   .car-item:nth-child(1) {
     transform: translate(40%, 70%);
     .txt {
@@ -148,14 +160,80 @@ section {
     }
   }
 }
+/* 小汽車依序動畫 */
+.s1 {
+  --ani-time-gap: 0.5s;
+  .car-list {
+    .car-item:nth-child(1) {
+      img {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 0);
+      }
+      .txt {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 6);
+      }
+    }
+    .car-item:nth-child(2) {
+      img {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 1);
+      }
+      .txt {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 7);
+      }
+    }
+    .car-item:nth-child(3) {
+      img {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 2);
+      }
+      .txt {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 8);
+      }
+    }
+    .car-item:nth-child(4) {
+      img {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 3);
+      }
+      .txt {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 9);
+      }
+    }
+    .car-item:nth-child(5) {
+      img {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 4);
+      }
+      .txt {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 10);
+      }
+    }
+    .car-item:nth-child(6) {
+      img {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 5);
+      }
+      .txt {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 11);
+      }
+    }
+  }
+}
 .s2,
-.s3,
 .s3,
 .s4,
 .s5,
 .s6 {
   .car-list {
     opacity: 0;
+    transition: 0.5s;
   }
 }
 
@@ -350,6 +428,7 @@ section {
       position: absolute;
       width: 100%;
       opacity: 0;
+      transition: 1s;
     }
   }
   .s1 {
@@ -437,7 +516,7 @@ section {
     }
     .light-circle {
       --inset-inline: 20%;
-      transform: translateY(0%);
+      transform: scaleY(0.5) translateY(14%);
       width: calc(100% - var(--inset-inline) * 2);
     }
   }
@@ -448,7 +527,7 @@ section {
     }
     .light-circle {
       --inset-inline: 20%;
-      transform: translateY(0%);
+      transform: scaleY(0.5) translateY(0%);
       width: calc(100% - var(--inset-inline) * 2);
     }
   }
@@ -458,7 +537,7 @@ section {
     opacity: 0;
     width: 26.875vw;
     position: absolute;
-    top: 50vw;
+    top: 39vw;
     right: 8.333333%;
     transform: translateY(-50%);
 
@@ -545,7 +624,6 @@ section {
 
   /* 三顆泡泡 */
   .intelligence-bubble {
-    opacity: 0;
     position: absolute;
     z-index: 3;
     left: 0;
@@ -556,6 +634,8 @@ section {
     gap: 1vw;
 
     .bubble {
+      opacity: 0;
+      transition: 1s;
       &:nth-child(odd) {
         transform: translateY(30%);
       }
@@ -566,6 +646,8 @@ section {
   }
 
   .s6 .intelligence-bubble {
-    opacity: 1;
+    .bubble {
+      opacity: 1;
+    }
   }
 }
