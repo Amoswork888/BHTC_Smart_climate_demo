@@ -484,6 +484,17 @@ section {
         width: 100%;
         height: auto;
       }
+      img.car_ready {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        transform: translateY(-2%);
+        margin: auto;
+        width: 55%;
+        height: auto;
+        transition: opacity 1s 1s;
+      }
     }
 
     .light-circle {
