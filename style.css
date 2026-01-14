@@ -492,7 +492,7 @@ section {
       left: var(--inset-inline);
       right: var(--inset-inline);
       bottom: 0;
-      transform: translateY(-6%);
+      transform: scaleY(1) translateY(-6%);
       width: 100%;
       mix-blend-mode: screen;
       overflow: hidden;
@@ -527,7 +527,7 @@ section {
     }
     .light-circle {
       --inset-inline: 20%;
-      transform: scaleY(0.5) translateY(0%);
+      transform: scaleY(0.5) translateY(12%);
       width: calc(100% - var(--inset-inline) * 2);
     }
   }
@@ -637,7 +637,7 @@ section {
       opacity: 0;
       transition: 1s;
       &:nth-child(odd) {
-        transform: translateY(30%);
+        transform: translateY(34%);
       }
       img {
         width: 100%;
@@ -648,6 +648,7 @@ section {
   .s6 .intelligence-bubble {
     .bubble {
       opacity: 1;
+      transition-property: opacity;
       transition-delay: 1.5s;
     }
   }
