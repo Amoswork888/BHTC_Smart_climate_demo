@@ -229,8 +229,7 @@ section {
 .s2,
 .s3,
 .s4,
-.s5,
-.s6 {
+.s5 {
   .car-list {
     opacity: 0;
     transition: 0.5s;
@@ -456,11 +455,6 @@ section {
       opacity: 1;
     }
   }
-  .s6 {
-    .topic6 {
-      opacity: 1;
-    }
-  }
 
   .main-car {
     width: 100%;
@@ -518,8 +512,7 @@ section {
 
   .s2 .main-car,
   .s3 .main-car,
-  .s4 .main-car,
-  .s5 .main-car {
+  .s4 .main-car {
     transform: translateX(-16.66666667%);
 
     .car {
@@ -531,7 +524,7 @@ section {
       width: calc(100% - var(--inset-inline) * 2);
     }
   }
-  .s6 .main-car {
+  .s5 .main-car {
     transform: translateX(0%);
     .car {
       transform: translateY(-6%);
@@ -592,12 +585,11 @@ section {
     }
   }
   .s2 .function,
-  .s3 .sys-progress,
-  .s4 .sys-progress {
+  .s3 .sys-progress {
     opacity: 1;
   }
 
-  .s5 .component-check {
+  .s4 .component-check {
     opacity: 1;
   }
 
@@ -630,7 +622,7 @@ section {
     }
   }
 
-  .s5 .component-list {
+  .s3 .component-list {
     opacity: 1;
   }
 
@@ -657,7 +649,7 @@ section {
     }
   }
 
-  .s6 .intelligence-bubble {
+  .s5 .intelligence-bubble {
     .bubble {
       opacity: 1;
       transition-property: opacity;
