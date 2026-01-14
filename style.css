@@ -544,6 +544,7 @@ section {
   }
 
   .function,
+  .sys-progress,
   .component-check {
     opacity: 0;
     width: 26.875vw;
@@ -591,8 +592,8 @@ section {
     }
   }
   .s2 .function,
-  .s3 .function,
-  .s4 .function {
+  .s3 .sys-progress,
+  .s4 .sys-progress {
     opacity: 1;
   }
 
