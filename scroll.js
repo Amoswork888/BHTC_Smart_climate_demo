@@ -11,7 +11,7 @@
   // 設定 section 高度
   function setSectionHeight() {
     firstHeight = first.offsetHeight || first.getBoundingClientRect().height;
-    section.style.height = firstHeight * 7 + "px";
+    section.style.height = firstHeight * 6 + "px";
   }
   setSectionHeight();
 
@@ -24,19 +24,19 @@
     let active = null;
     // Use section top + multiples of first container height as virtual triggers
     const sectionTop = section.getBoundingClientRect().top + scrollY;
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 5; i++) {
       const triggerTop = sectionTop + i * firstHeight;
       if (scrollY >= triggerTop - _myOffsetTop) active = i;
     }
 
     if (active === null) {
-      for (let n = 1; n <= 6; n++) first.classList.remove("s" + n);
+      for (let n = 1; n <= 5; n++) first.classList.remove("s" + n);
       lastActive = null;
       return;
     }
 
     if (active === lastActive) return;
-    for (let n = 1; n <= 6; n++) first.classList.remove("s" + n);
+    for (let n = 1; n <= 5; n++) first.classList.remove("s" + n);
     first.classList.add("s" + (active + 1));
     lastActive = active;
   }
