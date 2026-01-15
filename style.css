@@ -580,6 +580,7 @@ section {
           color: #fff;
           font-size: 1.875vw;
           text-align: center;
+          opacity: 0;
         }
       }
     }
@@ -611,6 +612,11 @@ section {
       opacity: 1;
       transform: translateX(0);
       transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 1);
+
+      .function-list-check {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 2.5);
+      }
     }
     li:nth-child(4) {
       opacity: 1;
@@ -621,6 +627,11 @@ section {
       opacity: 1;
       transform: translateX(0);
       transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 2);
+
+      .function-list-check {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 3);
+      }
     }
   }
 
