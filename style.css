@@ -12,6 +12,7 @@
   font-style: normal;
   font-variation-settings: "wdth" 100;
 } */
+
 :root {
   --title-txt-size: 3.333333vw;
   --title-line-height: 1.25;
@@ -23,6 +24,21 @@
   --txt-weight: 400;
   --slogan-font-size: 7.5vw;
   --slogan-color: #eafbff;
+}
+/* 定義一個自定義變數，並指定類型為整數，給跑百分比的動畫物件使用 */
+@property --percent {
+  syntax: "<integer>";
+  initial-value: 0;
+  inherits: false;
+}
+/* 計數動畫：把 --pct 從 0 推到 100 */
+@keyframes countUp {
+  from {
+    --percent: 0;
+  }
+  to {
+    --percent: 100;
+  }
 }
 section {
   width: 100%;
@@ -661,11 +677,68 @@ section {
 
   .sys-progress {
     opacity: 0;
+
+    .function-list {
+      .function-list-check {
+        position: relative;
+        color: #fff;
+
+        &::after {
+          content: counter(percent) " %";
+          color: currentColor;
+        }
+
+        img {
+          position: absolute;
+          inset: 0;
+          margin: auto;
+          opacity: 0;
+        }
+      }
+    }
+
+    .percentang {
+      display: flex;
+      justify-content: center;
+    }
   }
 
   .s3 .sys-progress {
+    --pct: 0;
     opacity: 1;
     transition: 0.5s;
+
+    .function-list {
+      --ani-time-duration: 0.5s;
+      li {
+        .function-list-check {
+          width: 4em;
+          /* 設定動畫：5秒，線性變化，停留在最後一幀 */
+          animation: countUp 2.5s linear forwards;
+          counter-reset: percent var(--percent);
+          color: #f00;
+        }
+      }
+      li:nth-child(1) {
+        .function-list-check {
+          opacity: 1;
+          animation-delay: var(--ani-time-duration);
+          color: transparent;
+          transition: color var(--ani-time-duration)
+            calc(var(--ani-time-duration) * 10);
+        }
+      }
+
+      li:nth-child(2) {
+        .function-list-check {
+          opacity: 1;
+          animation-delay: calc(var(--ani-time-duration) * 2);
+          color: transparent;
+          transition: color var(--ani-time-duration)
+            calc(var(--ani-time-duration) * 10);
+        }
+      }
+    }
   }
   .component-check {
     .component-check-list {
@@ -675,6 +748,7 @@ section {
       }
     }
   }
+
   .s4 .component-check {
     --ani-time-gap: 0.5s;
     li:nth-child(1) {
