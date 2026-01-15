@@ -783,6 +783,11 @@ section {
       opacity: 1;
       transform: translateX(0);
       transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 0.5);
+
+      .function-list-check {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 1);
+      }
     }
     li:nth-child(2) {
       opacity: 1;
@@ -798,6 +803,11 @@ section {
       opacity: 1;
       transform: translateX(0);
       transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 2);
+
+      .function-list-check {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 2.5);
+      }
     }
     li:nth-child(5) {
       opacity: 1;
@@ -808,6 +818,11 @@ section {
       opacity: 1;
       transform: translateX(0);
       transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 3);
+
+      .function-list-check {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 3.5);
+      }
     }
     li:nth-child(7) {
       opacity: 1;
