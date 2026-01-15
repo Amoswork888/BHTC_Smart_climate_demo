@@ -79,5 +79,84 @@
     }
   });
 
+  // 監聽 .s3 class 加入/移除事件
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (
+        mutation.type === "attributes" &&
+        mutation.attributeName === "class"
+      ) {
+        if (first.classList.contains("s3")) {
+          handleS3();
+        } else {
+          // .s3 被移除時，清除 li 的 style
+          clearLiStyles();
+        }
+      }
+    });
+  });
+
+  observer.observe(first, { attributes: true, attributeFilter: ["class"] });
+
+  // 處理 .s3 右側區塊動畫觸發的邏輯
+  function handleS3() {
+    const video = first.querySelector(".sys-progress .percentang video");
+    const percentang = first.querySelector(".sys-progress .percentang");
+    if (!video) return;
+
+    // 播放影片
+    video.play();
+
+    // 監聽影片播放完成
+    video.addEventListener(
+      "ended",
+      () => {
+        // 獲取 .percentang 以外的所有 li
+        const liElements = first.querySelectorAll(
+          ".sys-progress .function-list li:not(.percentang)"
+        );
+
+        let completedCount = 0;
+
+        // 對每個 li 做 fadeout
+        liElements.forEach((li) => {
+          li.style.transition = "opacity 0.5s ease-out";
+          li.style.opacity = "0";
+
+          // fadeout 完成後設定 visibility: hidden
+          li.addEventListener(
+            "transitionend",
+            () => {
+              li.style.visibility = "hidden";
+              completedCount++;
+
+              // 當所有 li 都完成 fadeout 後，為 video 添加 .done
+              if (completedCount === liElements.length) {
+                percentang.classList.add("done");
+              }
+            },
+            { once: true }
+          );
+        });
+      },
+      { once: true }
+    );
+  }
+
+  // 清除 .percentang 以外的 li 的 style
+  function clearLiStyles() {
+    const liElements = first.querySelectorAll(
+      ".sys-progress .function-list li:not(.percentang)"
+    );
+    const percentang = first.querySelector(".sys-progress .percentang");
+
+    liElements.forEach((li) => {
+      li.style.transition = "";
+      li.style.opacity = "";
+      li.style.visibility = "visible";
+    });
+    percentang.classList.remove("done");
+  }
+
   handleScroll();
 })();
