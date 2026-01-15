@@ -466,7 +466,7 @@ section {
       position: absolute;
       width: 100%;
       opacity: 0;
-      transition: 1s;
+      transition: 1s 1s;
     }
   }
   .s1 {
@@ -518,6 +518,7 @@ section {
         height: auto;
       }
       img.car_ready {
+        opacity: 0;
         position: absolute;
         left: 0;
         right: 0;
@@ -526,7 +527,7 @@ section {
         margin: auto;
         width: 55%;
         height: auto;
-        transition: opacity 1s 1s;
+        transition: opacity 1s 0s;
       }
     }
 
@@ -538,8 +539,6 @@ section {
       bottom: 0;
       transform: scaleY(1) translateY(-6%);
       width: 100%;
-      mix-blend-mode: screen;
-      overflow: hidden;
       transition: 1s;
 
       img,
@@ -561,6 +560,18 @@ section {
       --inset-inline: 20%;
       transform: scaleY(0.5) translateY(14%);
       width: calc(100% - var(--inset-inline) * 2);
+    }
+  }
+  .s3,
+  .s4,
+  .s5 {
+    .main-car {
+      .car {
+        .car_ready {
+          opacity: 1;
+          transition: opacity 1s 5s;
+        }
+      }
     }
   }
   .s5 .main-car {
