@@ -589,6 +589,41 @@ section {
     opacity: 1;
   }
 
+  .function {
+    --ani-time-gap: 0.5s;
+    li {
+      opacity: 0;
+      transform: translateX(-20%);
+    }
+  }
+  .s2 .function {
+    li:nth-child(1) {
+      opacity: 1;
+      transform: translateX(0);
+      transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 0);
+    }
+    li:nth-child(2) {
+      opacity: 1;
+      transform: translateX(0);
+      transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 0.5);
+    }
+    li:nth-child(3) {
+      opacity: 1;
+      transform: translateX(0);
+      transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 1);
+    }
+    li:nth-child(4) {
+      opacity: 1;
+      transform: translateX(0);
+      transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 1.5);
+    }
+    li:nth-child(5) {
+      opacity: 1;
+      transform: translateX(0);
+      transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 2);
+    }
+  }
+
   .s4 .component-check {
     opacity: 1;
   }
