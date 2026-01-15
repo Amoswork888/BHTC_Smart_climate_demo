@@ -706,11 +706,13 @@ section {
   .s3 .sys-progress {
     --pct: 0;
     opacity: 1;
-    transition: 0.5s;
 
     .function-list {
       /* 讀秒動畫播放時長 */
-      --ani-time-duration: 1s;
+      --ani-time-duration: 1.5s;
+      --ani-first-delay: 0.4s;
+      --font-fadeout-time: 0.5s;
+      --icon-fadein-time: 0.5s;
       li {
         .function-list-check {
           width: 4em;
@@ -722,20 +724,34 @@ section {
       li:nth-child(1) {
         .function-list-check {
           opacity: 1;
-          animation-delay: var(--ani-time-duration);
+          animation-delay: var(--ani-first-delay);
           color: transparent;
-          transition: color var(--ani-time-duration)
-            calc(var(--ani-time-duration) * 2);
+          transition: color var(--font-fadeout-time)
+            calc(var(--ani-time-duration) + var(--ani-first-delay));
+
+          img {
+            opacity: 1;
+            transition: opacity 0.5s
+              calc(var(--ani-time-duration) + var(--ani-first-delay));
+          }
         }
       }
 
       li:nth-child(2) {
         .function-list-check {
           opacity: 1;
-          animation-delay: calc(var(--ani-time-duration) * 2);
+          animation-delay: calc(
+            var(--ani-time-duration) + var(--ani-first-delay)
+          );
           color: transparent;
-          transition: color var(--ani-time-duration)
-            calc(var(--ani-time-duration) * 3);
+          transition: color var(--font-fadeout-time)
+            calc(var(--ani-time-duration) * 2 + var(--ani-first-delay));
+
+          img {
+            opacity: 1;
+            transition: opacity var(--ani-time-duration)
+              calc(var(--ani-time-duration) * 2 + var(--ani-first-delay));
+          }
         }
       }
     }
@@ -823,26 +839,26 @@ section {
   }
 
   .s3 .component-list {
-    --ani-time-gap: 0.8s;
+    --ani-time-gap: 0.6s;
     .item:nth-child(1) {
-      opacity: 1;
-      transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 0.5);
-    }
-    .item:nth-child(2) {
       opacity: 1;
       transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 1);
     }
-    .item:nth-child(3) {
-      opacity: 1;
-      transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 1.5);
-    }
-    .item:nth-child(4) {
+    .item:nth-child(2) {
       opacity: 1;
       transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 2);
     }
+    .item:nth-child(3) {
+      opacity: 1;
+      transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 3);
+    }
+    .item:nth-child(4) {
+      opacity: 1;
+      transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 4);
+    }
     .item:nth-child(5) {
       opacity: 1;
-      transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 2.5);
+      transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 5);
     }
   }
   /* 三顆泡泡 */
