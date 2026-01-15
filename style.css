@@ -700,6 +700,7 @@ section {
     .percentang {
       display: flex;
       justify-content: center;
+      border-top: none !important;
     }
   }
 
