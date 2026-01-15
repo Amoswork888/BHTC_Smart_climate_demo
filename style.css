@@ -171,57 +171,57 @@ section {
       }
       .txt {
         opacity: 1;
-        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 6);
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 3);
       }
     }
     .car-item:nth-child(2) {
+      img {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 0.5);
+      }
+      .txt {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 3.5);
+      }
+    }
+    .car-item:nth-child(3) {
       img {
         opacity: 1;
         transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 1);
       }
       .txt {
         opacity: 1;
-        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 7);
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 4);
       }
     }
-    .car-item:nth-child(3) {
+    .car-item:nth-child(4) {
+      img {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 1.5);
+      }
+      .txt {
+        opacity: 1;
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 4.5);
+      }
+    }
+    .car-item:nth-child(5) {
       img {
         opacity: 1;
         transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 2);
       }
       .txt {
         opacity: 1;
-        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 8);
-      }
-    }
-    .car-item:nth-child(4) {
-      img {
-        opacity: 1;
-        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 3);
-      }
-      .txt {
-        opacity: 1;
-        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 9);
-      }
-    }
-    .car-item:nth-child(5) {
-      img {
-        opacity: 1;
-        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 4);
-      }
-      .txt {
-        opacity: 1;
-        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 10);
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 5);
       }
     }
     .car-item:nth-child(6) {
       img {
         opacity: 1;
-        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 5);
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 2.5);
       }
       .txt {
         opacity: 1;
-        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 11);
+        transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 5.5);
       }
     }
   }
@@ -622,6 +622,15 @@ section {
       transform: translateX(0);
       transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 2);
     }
+  }
+
+  .sys-progress {
+    opacity: 0;
+  }
+
+  .s3 .sys-progress {
+    opacity: 1;
+    transition: 0.5s;
   }
 
   .s4 .component-check {
