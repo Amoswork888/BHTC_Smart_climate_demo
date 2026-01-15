@@ -28,6 +28,29 @@ section {
   width: 100%;
   aspect-ratio: 16 / 10;
 }
+.scroll-icon {
+  position: fixed;
+  z-index: 10;
+  width: 100px;
+  bottom: 3vh;
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  animation: scroll-icon 1s infinite alternate;
+  opacity: 0.5;
+
+  img {
+    width: 100%;
+  }
+}
+@keyframes scroll-icon {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-10%);
+  }
+}
 
 /* KV ==================================================== */
 .section-index-kv {
