@@ -101,6 +101,7 @@
   // 處理 .s3 右側區塊動畫觸發的邏輯
   function handleS3() {
     const video = first.querySelector(".sys-progress .percentang video");
+    const percentang = first.querySelector(".sys-progress .percentang");
     if (!video) return;
 
     // 播放影片
@@ -115,16 +116,24 @@
           ".sys-progress .function-list li:not(.percentang)"
         );
 
+        let completedCount = 0;
+
         // 對每個 li 做 fadeout
         liElements.forEach((li) => {
           li.style.transition = "opacity 0.5s ease-out";
           li.style.opacity = "0";
 
-          // fadeout 完成後設定 display: none
+          // fadeout 完成後設定 visibility: hidden
           li.addEventListener(
             "transitionend",
             () => {
-              li.style.display = "none";
+              li.style.visibility = "hidden";
+              completedCount++;
+
+              // 當所有 li 都完成 fadeout 後，為 video 添加 .done
+              if (completedCount === liElements.length) {
+                percentang.classList.add("done");
+              }
             },
             { once: true }
           );
@@ -139,12 +148,14 @@
     const liElements = first.querySelectorAll(
       ".sys-progress .function-list li:not(.percentang)"
     );
+    const percentang = first.querySelector(".sys-progress .percentang");
 
     liElements.forEach((li) => {
       li.style.transition = "";
       li.style.opacity = "";
-      li.style.display = "";
+      li.style.visibility = "visible";
     });
+    percentang.classList.remove("done");
   }
 
   handleScroll();
