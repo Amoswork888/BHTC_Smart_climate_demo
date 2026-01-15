@@ -1,4 +1,33 @@
 (function () {
+  // 添加點一下播放功能，避免自動播放被瀏覽器阻擋
+  let videoUnlocked = false;
+
+  function unlockVideo(video) {
+    if (videoUnlocked || !video) return;
+    videoUnlocked = true;
+
+    const p = video.play();
+    if (p && typeof p.then === "function") {
+      p.then(() => {
+        video.pause();
+        video.currentTime = 0;
+      }).catch(() => {
+        // 若還是不行，代表該 WebView/影片設定更嚴格
+        videoUnlocked = false;
+      });
+    }
+  }
+
+  // 任何一次手勢都算：pointerdown 最泛用
+  window.addEventListener(
+    "pointerdown",
+    () => {
+      const v = first.querySelector(".sys-progress .percentang video");
+      unlockVideo(v);
+    },
+    { once: true }
+  );
+
   const section = document.querySelector(".section-part1");
   if (!section) return;
 
@@ -99,48 +128,55 @@
   observer.observe(first, { attributes: true, attributeFilter: ["class"] });
 
   // 處理 .s3 右側區塊動畫觸發的邏輯
+  let s3Running = false;
+
   function handleS3() {
     const video = first.querySelector(".sys-progress .percentang video");
     const percentang = first.querySelector(".sys-progress .percentang");
-    if (!video) return;
+    if (!video || !percentang) return;
 
-    // 播放影片
-    video.play();
+    // 避免在 s3 狀態下重複觸發一堆次
+    if (s3Running) return;
+    s3Running = true;
 
-    // 監聽影片播放完成
-    video.addEventListener(
-      "ended",
-      () => {
-        // 獲取 .percentang 以外的所有 li
-        const liElements = first.querySelectorAll(
-          ".sys-progress .function-list li:not(.percentang)"
+    // 建議加上（若你 HTML 沒寫）
+    video.playsInline = true;
+
+    // 播放（要接住 Promise）
+    const p = video.play();
+    if (p && typeof p.then === "function") {
+      p.catch(() => {
+        // 播放被擋：直接解除 running，等待使用者點一下解鎖後再進 s3
+        s3Running = false;
+      });
+    }
+
+    // 用 onended 取代 addEventListener，避免累積
+    video.onended = () => {
+      const liElements = first.querySelectorAll(
+        ".sys-progress .function-list li:not(.percentang)"
+      );
+
+      let completedCount = 0;
+
+      liElements.forEach((li) => {
+        li.style.transition = "opacity 0.5s ease-out";
+        li.style.opacity = "0";
+
+        li.addEventListener(
+          "transitionend",
+          () => {
+            li.style.visibility = "hidden";
+            completedCount++;
+            if (completedCount === liElements.length) {
+              percentang.classList.add("done");
+              s3Running = false; // 完成後解鎖下一次
+            }
+          },
+          { once: true }
         );
-
-        let completedCount = 0;
-
-        // 對每個 li 做 fadeout
-        liElements.forEach((li) => {
-          li.style.transition = "opacity 0.5s ease-out";
-          li.style.opacity = "0";
-
-          // fadeout 完成後設定 visibility: hidden
-          li.addEventListener(
-            "transitionend",
-            () => {
-              li.style.visibility = "hidden";
-              completedCount++;
-
-              // 當所有 li 都完成 fadeout 後，為 video 添加 .done
-              if (completedCount === liElements.length) {
-                percentang.classList.add("done");
-              }
-            },
-            { once: true }
-          );
-        });
-      },
-      { once: true }
-    );
+      });
+    };
   }
 
   // 清除 .percentang 以外的 li 的 style
@@ -156,6 +192,13 @@
       li.style.visibility = "visible";
     });
     percentang.classList.remove("done");
+    const video = first.querySelector(".sys-progress .percentang video");
+    if (video) {
+      video.pause();
+      video.currentTime = 0; // 你要「每次進 s3 都從頭播」就留著
+      video.onended = null; // 清掉 handler，避免殘留狀態
+    }
+    s3Running = false;
   }
 
   handleScroll();
