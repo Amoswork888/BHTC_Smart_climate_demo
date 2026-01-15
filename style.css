@@ -709,14 +709,14 @@ section {
     transition: 0.5s;
 
     .function-list {
-      --ani-time-duration: 0.5s;
+      /* 讀秒動畫播放時長 */
+      --ani-time-duration: 1s;
       li {
         .function-list-check {
           width: 4em;
           /* 設定動畫：5秒，線性變化，停留在最後一幀 */
-          animation: countUp 2.5s linear forwards;
+          animation: countUp var(--ani-time-duration) linear forwards;
           counter-reset: percent var(--percent);
-          color: #f00;
         }
       }
       li:nth-child(1) {
@@ -725,7 +725,7 @@ section {
           animation-delay: var(--ani-time-duration);
           color: transparent;
           transition: color var(--ani-time-duration)
-            calc(var(--ani-time-duration) * 10);
+            calc(var(--ani-time-duration) * 2);
         }
       }
 
@@ -735,7 +735,7 @@ section {
           animation-delay: calc(var(--ani-time-duration) * 2);
           color: transparent;
           transition: color var(--ani-time-duration)
-            calc(var(--ani-time-duration) * 10);
+            calc(var(--ani-time-duration) * 3);
         }
       }
     }
