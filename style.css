@@ -649,7 +649,6 @@ section {
   }
 
   .component-list {
-    opacity: 0;
     position: absolute;
     z-index: 3;
     left: 12vw;
@@ -658,6 +657,7 @@ section {
     gap: 1vw;
 
     .item {
+      opacity: 0;
       width: 7.70833333vw;
       img {
         width: 100%;
@@ -678,9 +678,28 @@ section {
   }
 
   .s3 .component-list {
-    opacity: 1;
+    --ani-time-gap: 0.8s;
+    .item:nth-child(1) {
+      opacity: 1;
+      transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 0.5);
+    }
+    .item:nth-child(2) {
+      opacity: 1;
+      transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 1);
+    }
+    .item:nth-child(3) {
+      opacity: 1;
+      transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 1.5);
+    }
+    .item:nth-child(4) {
+      opacity: 1;
+      transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 2);
+    }
+    .item:nth-child(5) {
+      opacity: 1;
+      transition: var(--ani-time-gap) calc(var(--ani-time-gap) * 2.5);
+    }
   }
-
   /* 三顆泡泡 */
   .intelligence-bubble {
     position: absolute;
