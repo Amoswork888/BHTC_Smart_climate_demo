@@ -699,6 +699,10 @@ section {
           color: currentColor;
         }
 
+        li {
+          padding-block: 4ex;
+        }
+
         img {
           position: absolute;
           inset: 0;
