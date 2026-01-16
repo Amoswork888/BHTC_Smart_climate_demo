@@ -74,6 +74,7 @@
     if (!ticking) {
       requestAnimationFrame(() => {
         handleScroll();
+        handleBackToTop();
         ticking = false;
       });
       ticking = true;
@@ -199,6 +200,28 @@
       video.onended = null; // 清掉 handler，避免殘留狀態
     }
     s3Running = false;
+  }
+
+  // 處理 back-to-top 按鈕顯示
+  function handleBackToTop() {
+    const allContainers = document.querySelectorAll(".container");
+    if (allContainers.length === 0) return;
+
+    const lastContainer = allContainers[allContainers.length - 1];
+    const lastContainerTop =
+      lastContainer.getBoundingClientRect().top + window.scrollY;
+    const triggerPoint = lastContainerTop - 200;
+
+    const backToTopButton = document.querySelector(".back-to-top");
+    if (!backToTopButton) return;
+
+    const scrollY = window.scrollY || window.pageYOffset;
+
+    if (scrollY >= triggerPoint) {
+      backToTopButton.classList.add("show");
+    } else {
+      backToTopButton.classList.remove("show");
+    }
   }
 
   handleScroll();
