@@ -647,6 +647,11 @@ section {
       opacity: 0;
       transform: translateX(-20%);
     }
+    li:nth-child(5) {
+      .function-list-check {
+        width: 0;
+      }
+    }
   }
   .s2 .function {
     li:nth-child(1) {
