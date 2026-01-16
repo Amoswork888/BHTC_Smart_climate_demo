@@ -74,6 +74,7 @@
     if (!ticking) {
       requestAnimationFrame(() => {
         handleScroll();
+        handleBackToTop();
         ticking = false;
       });
       ticking = true;
@@ -199,6 +200,25 @@
       video.onended = null; // 清掉 handler，避免殘留狀態
     }
     s3Running = false;
+  }
+
+  // 處理 back-to-top 按鈕顯示
+  function handleBackToTop() {
+    const scrollY = window.scrollY || window.pageYOffset;
+    const documentHeight = document.documentElement.scrollHeight;
+    const viewportHeight = window.innerHeight;
+
+    // 最後一個 100vh 減 200px 的位置
+    const triggerPoint = documentHeight - viewportHeight - 300;
+
+    const backToTopButton = document.querySelector(".back-to-top");
+    if (!backToTopButton) return;
+
+    if (scrollY >= triggerPoint) {
+      backToTopButton.classList.add("show");
+    } else {
+      backToTopButton.classList.remove("show");
+    }
   }
 
   handleScroll();
