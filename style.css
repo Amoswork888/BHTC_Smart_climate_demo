@@ -80,6 +80,7 @@ section {
   right: 8.02083333%;
   bottom: 8.02083333%;
   pointer-events: none;
+  transition: 1s;
   a {
     display: block;
     img {
