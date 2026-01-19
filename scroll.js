@@ -1,33 +1,5 @@
 (function () {
-  // 添加點一下播放功能，避免自動播放被瀏覽器阻擋
-  let videoUnlocked = false;
-
-  function unlockVideo(video) {
-    if (videoUnlocked || !video) return;
-    videoUnlocked = true;
-
-    const p = video.play();
-    if (p && typeof p.then === "function") {
-      p.then(() => {
-        video.pause();
-        video.currentTime = 0;
-      }).catch(() => {
-        // 若還是不行，代表該 WebView/影片設定更嚴格
-        videoUnlocked = false;
-      });
-    }
-  }
-
-  // 任何一次手勢都算：pointerdown 最泛用
-  window.addEventListener(
-    "pointerdown",
-    () => {
-      const v = first.querySelector(".sys-progress .percentang video");
-      unlockVideo(v);
-    },
-    { once: true }
-  );
-
+  // 先取得 DOM（避免 first 未初始化就被用到）
   const section = document.querySelector(".section-part1");
   if (!section) return;
 
@@ -35,9 +7,41 @@
   const first = containers[0];
   if (!first) return;
 
+  // 添加點一下播放功能，避免自動播放被瀏覽器阻擋
+  let videoUnlocked = false;
+
+  function unlockVideo(video) {
+    if (!video || videoUnlocked) return;
+
+    const p = video.play();
+    if (p && typeof p.then === "function") {
+      p.then(() => {
+        video.pause();
+        try {
+          video.currentTime = 0;
+        } catch (e) {}
+        videoUnlocked = true; // 成功才鎖定
+      }).catch(() => {
+        // 失敗就保持可重試
+        videoUnlocked = false;
+      });
+    }
+  }
+
+  // 任何一次手勢都算：pointerdown（改成可重試，成功後自動不再做事）
+  window.addEventListener(
+    "pointerdown",
+    () => {
+      if (videoUnlocked) return;
+      const v = first.querySelector(".sys-progress .percentang video");
+      unlockVideo(v);
+    },
+    { passive: true }
+  );
+
   let firstHeight = first.offsetHeight || first.getBoundingClientRect().height;
 
-  // 設定 section 高度
+  // ✅ 依你的需求：維持 firstHeight * 6 不改
   function setSectionHeight() {
     firstHeight = first.offsetHeight || first.getBoundingClientRect().height;
     section.style.height = firstHeight * 6 + "px";
@@ -51,8 +55,8 @@
   function handleScroll() {
     const scrollY = window.scrollY || window.pageYOffset;
     let active = null;
-    // Use section top + multiples of first container height as virtual triggers
     const sectionTop = section.getBoundingClientRect().top + scrollY;
+
     for (let i = 0; i < 5; i++) {
       const triggerTop = sectionTop + i * firstHeight;
       if (scrollY >= triggerTop - _myOffsetTop) active = i;
@@ -70,6 +74,20 @@
     lastActive = active;
   }
 
+  function handleBackToTop() {
+    const scrollY = window.scrollY || window.pageYOffset;
+    const documentHeight = document.documentElement.scrollHeight;
+    const viewportHeight = window.innerHeight;
+
+    const triggerPoint = documentHeight - viewportHeight - 300;
+
+    const backToTopButton = document.querySelector(".back-to-top");
+    if (!backToTopButton) return;
+
+    if (scrollY >= triggerPoint) backToTopButton.classList.add("show");
+    else backToTopButton.classList.remove("show");
+  }
+
   function onScroll() {
     if (!ticking) {
       requestAnimationFrame(() => {
@@ -81,10 +99,8 @@
     }
   }
 
-  // 卷動時觸發
   window.addEventListener("scroll", onScroll, { passive: true });
 
-  // resize 時重新計算
   window.addEventListener("resize", () => {
     setSectionHeight();
     handleScroll();
@@ -109,26 +125,32 @@
     }
   });
 
-  // 監聽 .s3 class 加入/移除事件
+  const percentangVideo = first.querySelector(
+    ".sys-progress .percentang video"
+  );
+  if (percentangVideo) {
+    percentangVideo.addEventListener("loadedmetadata", () => {
+      percentangVideo.pause();
+      try {
+        percentangVideo.currentTime = 0.05;
+      } catch (e) {}
+    });
+  }
+
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       if (
         mutation.type === "attributes" &&
         mutation.attributeName === "class"
       ) {
-        if (first.classList.contains("s3")) {
-          handleS3();
-        } else {
-          // .s3 被移除時，清除 li 的 style
-          clearLiStyles();
-        }
+        if (first.classList.contains("s3")) handleS3();
+        else clearLiStyles();
       }
     });
   });
 
   observer.observe(first, { attributes: true, attributeFilter: ["class"] });
 
-  // 處理 .s3 右側區塊動畫觸發的邏輯
   let s3Running = false;
 
   function handleS3() {
@@ -136,29 +158,33 @@
     const percentang = first.querySelector(".sys-progress .percentang");
     if (!video || !percentang) return;
 
-    // 避免在 s3 狀態下重複觸發一堆次
     if (s3Running) return;
     s3Running = true;
 
-    // 建議加上（若你 HTML 沒寫）
-    video.playsInline = true;
+    try {
+      video.currentTime = 0.05;
+    } catch (e) {}
 
-    // 播放（要接住 Promise）
     const p = video.play();
     if (p && typeof p.then === "function") {
       p.catch(() => {
-        // 播放被擋：直接解除 running，等待使用者點一下解鎖後再進 s3
         s3Running = false;
       });
     }
 
-    // 用 onended 取代 addEventListener，避免累積
     video.onended = () => {
       const liElements = first.querySelectorAll(
         ".sys-progress .function-list li:not(.percentang)"
       );
 
       let completedCount = 0;
+      const done = () => {
+        percentang.classList.add("done");
+        s3Running = false;
+      };
+
+      // ✅ 保險：避免 transitionend 沒觸發造成卡死
+      const safetyTimer = setTimeout(done, 800);
 
       liElements.forEach((li) => {
         li.style.transition = "opacity 0.5s ease-out";
@@ -170,8 +196,8 @@
             li.style.visibility = "hidden";
             completedCount++;
             if (completedCount === liElements.length) {
-              percentang.classList.add("done");
-              s3Running = false; // 完成後解鎖下一次
+              clearTimeout(safetyTimer);
+              done();
             }
           },
           { once: true }
@@ -180,7 +206,6 @@
     };
   }
 
-  // 清除 .percentang 以外的 li 的 style
   function clearLiStyles() {
     const liElements = first.querySelectorAll(
       ".sys-progress .function-list li:not(.percentang)"
@@ -193,32 +218,16 @@
       li.style.visibility = "visible";
     });
     percentang.classList.remove("done");
+
     const video = first.querySelector(".sys-progress .percentang video");
     if (video) {
       video.pause();
-      video.currentTime = 0; // 你要「每次進 s3 都從頭播」就留著
-      video.onended = null; // 清掉 handler，避免殘留狀態
+      try {
+        video.currentTime = 0;
+      } catch (e) {}
+      video.onended = null;
     }
     s3Running = false;
-  }
-
-  // 處理 back-to-top 按鈕顯示
-  function handleBackToTop() {
-    const scrollY = window.scrollY || window.pageYOffset;
-    const documentHeight = document.documentElement.scrollHeight;
-    const viewportHeight = window.innerHeight;
-
-    // 最後一個 100vh 減 200px 的位置
-    const triggerPoint = documentHeight - viewportHeight - 300;
-
-    const backToTopButton = document.querySelector(".back-to-top");
-    if (!backToTopButton) return;
-
-    if (scrollY >= triggerPoint) {
-      backToTopButton.classList.add("show");
-    } else {
-      backToTopButton.classList.remove("show");
-    }
   }
 
   handleScroll();
