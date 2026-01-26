@@ -462,7 +462,6 @@ section {
     }
   }
 
-  .container-understands,
   .container-multiple-zones {
     .other-info {
       position: absolute;
@@ -477,6 +476,33 @@ section {
       .pic {
         width: 17.55208333vw;
         height: 17.55208333vw;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+      }
+    }
+  }
+
+  .container-understands {
+    .other-info {
+      position: absolute;
+      top: 33%;
+      width: 100%;
+      z-index: 4;
+
+      display: flex;
+      justify-content: center;
+      gap: 0vw;
+
+      .pic {
+        width: 17.55208333vw;
+        height: 17.55208333vw;
+        &:nth-child(2) {
+          transform: translateY(-50%);
+        }
 
         img {
           width: 100%;
@@ -725,33 +751,30 @@ section {
     opacity: 0;
 
     .function-list {
-      li {
-        padding-block: 4ex;
-      }
-      li:nth-child(1),
-      li:nth-child(2) {
-        .function-list-check {
-          position: relative;
-          color: #fff;
+      .function-list-check {
+        position: relative;
+        color: #fff;
 
-          &::after {
-            content: counter(percent) " %";
-            color: currentColor;
-          }
+        &::after {
+          content: counter(percent) " %";
+          color: currentColor;
+        }
 
-          img {
-            position: absolute;
-            inset: 0;
-            margin: auto;
-            opacity: 0;
-          }
+        li {
+          padding-block: 4ex;
+        }
+
+        img {
+          position: absolute;
+          inset: 0;
+          margin: auto;
+          opacity: 0;
         }
       }
     }
 
     .percentang {
-      /* for 影片使用 */
-      /* display: flex;
+      display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -763,8 +786,10 @@ section {
       &.done {
         color: #fff;
         transform: translateY(-50%);
-        transition: transform 0.5s, color 0.5s 0.5s;
-      } */
+        transition:
+          transform 0.5s,
+          color 0.5s 0.5s;
+      }
     }
   }
 
@@ -819,20 +844,6 @@ section {
           }
         }
       }
-    }
-
-    .percentang {
-      /* for 百分比圖片使用 */
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: transparent;
-      font-size: var(--txt-size);
-      border-top: none !important;
-      transform: translateY(0%);
-      opacity: 0;
-      animation: percentangShow 2s 3.5s both;
     }
   }
   .component-check {
