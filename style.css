@@ -844,6 +844,14 @@ section {
           }
         }
       }
+
+      .process-done {
+        opacity: 0;
+        animation: percentangShow 0.5s 4s both;
+      }
+      .txt {
+        animation: percentangShow 0.5s 4.5s both;
+      }
     }
   }
   .component-check {
