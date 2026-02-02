@@ -307,22 +307,77 @@
   let s3Running = false;
 
   function handleS3() {
-    const video = first.querySelector(".sys-progress .percentang video");
+    // 改為使用主車的星芒影片作為觸發控制（class: .car-star）
+    const video = first.querySelector(".main-car .car video.car-star");
     const percentang = first.querySelector(".sys-progress .percentang");
     if (!video || !percentang) return;
-
-    if (s3Running) return;
-    s3Running = true;
 
     try {
       video.currentTime = 0.05;
     } catch (e) {}
 
-    const p = video.play();
-    if (p && typeof p.then === "function") {
-      p.catch(() => {
-        s3Running = false;
+    // 當 .s3 發生後，監聽 .percentang 的 class 變化（關注 .done 是否被加入），
+    // 當偵測到 .done 時，啟動主車的星芒影片（.car-star）播放
+    if (!percentang._doneObserverAttached) {
+      const playStar = () => {
+        try {
+          const video_carStar = first.querySelector(
+            ".main-car .car video.car-star",
+          );
+          if (!video_carStar) return;
+          const pr = video_carStar.play();
+          if (pr && typeof pr.then === "function") pr.catch(() => {});
+        } catch (e) {}
+      };
+
+      const onPercentangClassChange = (mutations) => {
+        for (const m of mutations) {
+          if (m.type === "attributes" && m.attributeName === "class") {
+            if (percentang.classList.contains("done")) {
+              playStar();
+              // 清理 observer 與 fallback
+              try {
+                if (percentang._doneObserver) {
+                  percentang._doneObserver.disconnect();
+                  percentang._doneObserver = null;
+                }
+                percentang._doneObserverAttached = false;
+                if (percentang._doneFallbackTimer) {
+                  clearTimeout(percentang._doneFallbackTimer);
+                  percentang._doneFallbackTimer = null;
+                }
+              } catch (e) {}
+              break;
+            }
+          }
+        }
+      };
+
+      // 建立 observer
+      const doneObserver = new MutationObserver(onPercentangClassChange);
+      doneObserver.observe(percentang, {
+        attributes: true,
+        attributeFilter: ["class"],
       });
+      percentang._doneObserver = doneObserver;
+      percentang._doneObserverAttached = true;
+
+      // 保險 fallback：若 class 沒被加入，則在超時後強制播放（避免卡死）
+      percentang._doneFallbackTimer = setTimeout(() => {
+        try {
+          if (s3Running) return;
+          s3Running = true;
+          playStar();
+        } catch (e) {}
+        try {
+          if (percentang._doneObserver) {
+            percentang._doneObserver.disconnect();
+            percentang._doneObserver = null;
+          }
+          percentang._doneObserverAttached = false;
+          percentang._doneFallbackTimer = null;
+        } catch (e) {}
+      }, 5000);
     }
 
     video.onended = () => {
@@ -372,13 +427,14 @@
     });
     percentang.classList.remove("done");
 
-    const video = first.querySelector(".sys-progress .percentang video");
-    if (video) {
-      video.pause();
+    // 清除主車星芒影片的播放狀態（若存在）
+    const video_carStar = first.querySelector(".main-car .car video.car-star");
+    if (video_carStar) {
+      video_carStar.pause();
       try {
-        video.currentTime = 0;
+        video_carStar.currentTime = 0;
       } catch (e) {}
-      video.onended = null;
+      video_carStar.onended = null;
     }
     s3Running = false;
   }
