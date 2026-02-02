@@ -662,6 +662,12 @@ section {
         height: auto;
         transition: opacity 1s 0s;
       }
+      video {
+        width: 90%;
+        position: absolute;
+        bottom: 4%;
+        left: 20%;
+      }
     }
 
     .light-circle {
