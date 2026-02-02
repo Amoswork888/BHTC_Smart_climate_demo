@@ -52,6 +52,9 @@
   let lastActive = null;
   let _myOffsetTop = 400;
 
+  // 判斷影片剩餘幾秒時視為「倒數」，可於此修改（單位：秒）
+  const mvCountdownSeconds = 1;
+
   // 用來記錄上一次的捲軸位置，以判斷是往上或往下捲動（初始化）
   let previousScrollY = window.scrollY || window.pageYOffset;
 
@@ -169,6 +172,7 @@
       const elemTop = rect.top + scrollY; // 元素相對文件上方的位置
 
       // 向下捲動：當卷軸往下捲到 .container-p2kv 頂端 - 300px 時，播放影片（只播放一次，避免重複觸發）
+      // 同時為容器加上 .mv-on 樣式（代表影片正在透過捲軸被觸發播放）
       if (scrollingDown && scrollY >= elemTop - 300) {
         if (!v._p2kvPlayed) {
           try {
@@ -177,17 +181,49 @@
               p.catch(() => {});
             }
           } catch (e) {}
+
+          // 標記已觸發播放（避免重複嘗試播放）
           v._p2kvPlayed = true;
+
+          // 監聽播放進度，動態偵測何時只剩下 mvCountdownSeconds 秒或更少
+          const onTimeUpdate = () => {
+            try {
+              const dur = v.duration;
+              if (!isFinite(dur) || dur <= 0) return;
+              const remaining = dur - v.currentTime;
+              if (remaining <= mvCountdownSeconds) {
+                // 當剩餘時間 <= mvCountdownSeconds 時加入 .mv-on，並移除監聽以避免重複觸發
+                try {
+                  c.classList.add("mv-on");
+                } catch (e) {}
+                v.removeEventListener("timeupdate", onTimeUpdate);
+              }
+            } catch (e) {}
+          };
+
+          v.addEventListener("timeupdate", onTimeUpdate);
+
+          // 保險：若目前已在倒數 mvCountdownSeconds 範圍（例如短片或已播放到末段），立即加上並移除監聽
+          try {
+            if (isFinite(v.duration) && v.duration - v.currentTime <= mvCountdownSeconds) {
+              c.classList.add("mv-on");
+              v.removeEventListener("timeupdate", onTimeUpdate);
+            }
+          } catch (e) {}
         }
       }
 
       // 向上捲動：當元素頂端到達視窗底部（>= 100vh）時，重置影片時間到 0s 並暫停
+      // 同時移除 .mv-on，代表影片不再處於捲軸觸發播放狀態
       if (scrollingUp && rect.top >= viewportHeight) {
         try {
           v.pause();
           v.currentTime = 0;
         } catch (e) {}
         v._p2kvPlayed = false;
+        try {
+          c.classList.remove("mv-on");
+        } catch (e) {}
       }
     });
   }
