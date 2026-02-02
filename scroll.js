@@ -53,7 +53,7 @@
   let _myOffsetTop = 400;
 
   // 判斷影片剩餘幾秒時視為「倒數」，可於此修改（單位：秒）
-  const mvCountdownSeconds = 1;
+  const mvCountdownSeconds = 2;
 
   // 用來記錄上一次的捲軸位置，以判斷是往上或往下捲動（初始化）
   let previousScrollY = window.scrollY || window.pageYOffset;
@@ -205,7 +205,10 @@
 
           // 保險：若目前已在倒數 mvCountdownSeconds 範圍（例如短片或已播放到末段），立即加上並移除監聽
           try {
-            if (isFinite(v.duration) && v.duration - v.currentTime <= mvCountdownSeconds) {
+            if (
+              isFinite(v.duration) &&
+              v.duration - v.currentTime <= mvCountdownSeconds
+            ) {
               c.classList.add("mv-on");
               v.removeEventListener("timeupdate", onTimeUpdate);
             }
