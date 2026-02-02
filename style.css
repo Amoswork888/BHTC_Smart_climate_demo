@@ -477,7 +477,63 @@ section {
         width: 17.55208333vw;
         height: 17.55208333vw;
 
+        &:nth-child(1):after,
+        &:nth-child(2):after {
+          content: "";
+          position: absolute;
+        }
+
+        &:nth-child(1):after {
+        }
+        &:nth-child(2):after {
+        }
+
         img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+      }
+    }
+  }
+
+  .container-p2kv {
+    .other-info {
+      position: absolute;
+      top: 14%;
+      width: 100%;
+      z-index: 4;
+
+      display: flex;
+      justify-content: center;
+      gap: 4vw;
+
+      .pic {
+        position: relative;
+        width: 17.55208333vw;
+        height: 17.55208333vw;
+        &:nth-child(1) {
+          transform: translateY(10%);
+
+          img.pointer {
+            width: 70%;
+          }
+        }
+
+        &:nth-child(2) {
+          transform: translateY(60%) translateX(30%);
+
+          img.pointer {
+            width: 90%;
+          }
+        }
+
+        img.pointer {
+          position: absolute;
+          bottom: 40%;
+          left: 80%;
+        }
+        img:first-child {
           width: 100%;
           height: 100%;
           object-fit: contain;
