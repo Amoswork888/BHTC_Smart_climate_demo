@@ -36,12 +36,12 @@
       const v = first.querySelector(".sys-progress .percentang video");
       unlockVideo(v);
     },
-    { passive: true }
+    { passive: true },
   );
 
   let firstHeight = first.offsetHeight || first.getBoundingClientRect().height;
 
-  // ✅ 依你的需求：維持 firstHeight * 6 不改
+  // firstHeight * 6
   function setSectionHeight() {
     firstHeight = first.offsetHeight || first.getBoundingClientRect().height;
     section.style.height = firstHeight * 6 + "px";
@@ -52,11 +52,51 @@
   let lastActive = null;
   let _myOffsetTop = 400;
 
-  // 用來記錄上一次的捲軸位置，以判斷是往上還是往下捲動
+  // 用來記錄上一次的捲軸位置，以判斷是往上或往下捲動（初始化）
   let previousScrollY = window.scrollY || window.pageYOffset;
 
+  /**
+   * 取得目前的垂直捲軸位置（cross-browser）
+   * @returns {number} 當前 scrollY
+   */
+  function getScrollY() {
+    return window.scrollY || window.pageYOffset;
+  }
+
+  /**
+   * 取得捲動方向並更新 previousScrollY
+   * 回傳： 1 表示往下捲動、-1 表示往上捲動、0 表示未改變
+   *
+   * 注意：此函式會更新 `previousScrollY`，每個 rAF 週期請只呼叫一次以避免競態
+   */
+  function getScrollDirection() {
+    const scrollY = getScrollY();
+    let dir = 0;
+    if (scrollY > previousScrollY) dir = 1;
+    else if (scrollY < previousScrollY) dir = -1;
+    previousScrollY = scrollY;
+    return dir;
+  }
+
+  /**
+   * 便利函式：是否正在往下捲動（會呼叫 getScrollDirection() 並回傳 bool）
+   * 若需避免更新 previousScrollY，請直接呼叫 getScrollDirection() 並自行處理回傳值
+   */
+  function isScrollingDown() {
+    return getScrollDirection() === 1;
+  }
+
+  /**
+   * 便利函式：是否正在往上捲動（會呼叫 getScrollDirection() 並回傳 bool）
+   */
+  function isScrollingUp() {
+    return getScrollDirection() === -1;
+  }
+
   // 找出頁面中所有 .container-p2kv，並準備對應的影片控制 flag
-  const p2kvContainers = Array.from(document.querySelectorAll(".container-p2kv"));
+  const p2kvContainers = Array.from(
+    document.querySelectorAll(".container-p2kv"),
+  );
   p2kvContainers.forEach((c) => {
     const v = c.querySelector("video");
     if (v) {
@@ -68,7 +108,7 @@
         () => {
           // 目前不需額外處理，但保留以防未來擴充
         },
-        { once: true }
+        { once: true },
       );
     }
   });
@@ -115,8 +155,10 @@
    * - 當往上捲動 且 元素頂端到達視窗底部（>= 100vh）時，該元素內的 video 時間軸回到 0s 並暫停
    */
   function handleP2KVScroll() {
-    const scrollY = window.scrollY || window.pageYOffset;
-    const scrollingDown = scrollY > previousScrollY;
+    const scrollY = getScrollY();
+    const direction = getScrollDirection(); // 1: down, -1: up, 0: no change
+    const scrollingDown = direction === 1;
+    const scrollingUp = direction === -1;
     const viewportHeight = window.innerHeight;
 
     p2kvContainers.forEach((c) => {
@@ -140,7 +182,7 @@
       }
 
       // 向上捲動：當元素頂端到達視窗底部（>= 100vh）時，重置影片時間到 0s 並暫停
-      if (!scrollingDown && rect.top >= viewportHeight) {
+      if (scrollingUp && rect.top >= viewportHeight) {
         try {
           v.pause();
           v.currentTime = 0;
@@ -148,8 +190,6 @@
         v._p2kvPlayed = false;
       }
     });
-
-    previousScrollY = scrollY;
   }
 
   function onScroll() {
@@ -200,7 +240,7 @@
   });
 
   const percentangVideo = first.querySelector(
-    ".sys-progress .percentang video"
+    ".sys-progress .percentang video",
   );
   if (percentangVideo) {
     percentangVideo.addEventListener("loadedmetadata", () => {
@@ -248,7 +288,7 @@
 
     video.onended = () => {
       const liElements = first.querySelectorAll(
-        ".sys-progress .function-list li:not(.percentang)"
+        ".sys-progress .function-list li:not(.percentang)",
       );
 
       let completedCount = 0;
@@ -274,7 +314,7 @@
               done();
             }
           },
-          { once: true }
+          { once: true },
         );
       });
     };
@@ -282,7 +322,7 @@
 
   function clearLiStyles() {
     const liElements = first.querySelectorAll(
-      ".sys-progress .function-list li:not(.percentang)"
+      ".sys-progress .function-list li:not(.percentang)",
     );
     const percentang = first.querySelector(".sys-progress .percentang");
 
