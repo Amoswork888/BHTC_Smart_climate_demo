@@ -52,6 +52,27 @@
   let lastActive = null;
   let _myOffsetTop = 400;
 
+  // 用來記錄上一次的捲軸位置，以判斷是往上還是往下捲動
+  let previousScrollY = window.scrollY || window.pageYOffset;
+
+  // 找出頁面中所有 .container-p2kv，並準備對應的影片控制 flag
+  const p2kvContainers = Array.from(document.querySelectorAll(".container-p2kv"));
+  p2kvContainers.forEach((c) => {
+    const v = c.querySelector("video");
+    if (v) {
+      // 自訂屬性用來記錄是否已依規則播放過
+      v._p2kvPlayed = false;
+      // 確保 metadata 載入時可以做必要的初始化（若需要）
+      v.addEventListener(
+        "loadedmetadata",
+        () => {
+          // 目前不需額外處理，但保留以防未來擴充
+        },
+        { once: true }
+      );
+    }
+  });
+
   function handleScroll() {
     const scrollY = window.scrollY || window.pageYOffset;
     let active = null;
@@ -88,11 +109,56 @@
     else backToTopButton.classList.remove("show");
   }
 
+  /**
+   * 處理 .container-p2kv 的捲軸與影片邏輯：
+   * - 當往下捲動 且 捲軸位置到達（元素頂端 - 300px）時，該元素內的 video 播放
+   * - 當往上捲動 且 元素頂端到達視窗底部（>= 100vh）時，該元素內的 video 時間軸回到 0s 並暫停
+   */
+  function handleP2KVScroll() {
+    const scrollY = window.scrollY || window.pageYOffset;
+    const scrollingDown = scrollY > previousScrollY;
+    const viewportHeight = window.innerHeight;
+
+    p2kvContainers.forEach((c) => {
+      const v = c.querySelector("video");
+      if (!v) return;
+
+      const rect = c.getBoundingClientRect();
+      const elemTop = rect.top + scrollY; // 元素相對文件上方的位置
+
+      // 向下捲動：當卷軸往下捲到 .container-p2kv 頂端 - 300px 時，播放影片（只播放一次，避免重複觸發）
+      if (scrollingDown && scrollY >= elemTop - 300) {
+        if (!v._p2kvPlayed) {
+          try {
+            const p = v.play();
+            if (p && typeof p.then === "function") {
+              p.catch(() => {});
+            }
+          } catch (e) {}
+          v._p2kvPlayed = true;
+        }
+      }
+
+      // 向上捲動：當元素頂端到達視窗底部（>= 100vh）時，重置影片時間到 0s 並暫停
+      if (!scrollingDown && rect.top >= viewportHeight) {
+        try {
+          v.pause();
+          v.currentTime = 0;
+        } catch (e) {}
+        v._p2kvPlayed = false;
+      }
+    });
+
+    previousScrollY = scrollY;
+  }
+
   function onScroll() {
     if (!ticking) {
       requestAnimationFrame(() => {
         handleScroll();
         handleBackToTop();
+        // 新增：同一個 rAF 內處理 .container-p2kv 的影片控制，保持效能
+        handleP2KVScroll();
         ticking = false;
       });
       ticking = true;
@@ -104,10 +170,14 @@
   window.addEventListener("resize", () => {
     setSectionHeight();
     handleScroll();
+    // 調整視窗大小時也要檢查 .container-p2kv 的狀態
+    handleP2KVScroll();
   });
   window.addEventListener("load", () => {
     setSectionHeight();
     handleScroll();
+    // 頁面載入完成後也執行一次 P2KV 檢查
+    handleP2KVScroll();
   });
 
   const media = first.querySelectorAll("img, video");
@@ -116,11 +186,15 @@
       m.addEventListener("loadedmetadata", () => {
         setSectionHeight();
         handleScroll();
+        // 影片 metadata 載入後也需判斷 .container-p2kv 的播放條件
+        handleP2KVScroll();
       });
     } else {
       m.addEventListener("load", () => {
         setSectionHeight();
         handleScroll();
+        // 圖片載入後亦需檢查（避免視高變動導致判斷錯誤）
+        handleP2KVScroll();
       });
     }
   });
@@ -231,4 +305,6 @@
   }
 
   handleScroll();
+  // 初始化時一併檢查並觸發 .container-p2kv 的影片控制
+  handleP2KVScroll();
 })();
