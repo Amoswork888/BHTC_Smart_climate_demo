@@ -314,6 +314,7 @@ section {
 .section-part1 {
   position: relative;
   background: url(images/bg-gradient.png) no-repeat center top / cover;
+  overflow: hidden;
 
   &::before {
     content: "";
