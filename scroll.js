@@ -13,7 +13,7 @@
   function unlockVideo(video) {
     if (!video || videoUnlocked) return;
 
-    // ⭐ 關鍵：先靜音 + 行動裝置 inline 播放
+    // 先靜音 + 行動裝置 inline 播放
     video.muted = true;
     video.playsInline = true;
 
@@ -181,9 +181,20 @@
           try {
             const p = v.play();
             if (p && typeof p.then === "function") {
-              p.catch(() => {});
+              p.then(() => {
+                // 播放成功，才標記已播放
+                v._p2kvPlayed = true;
+              }).catch(() => {
+                // 播放失敗，保留重試機會
+                v._p2kvPlayed = false;
+              });
+            } else {
+              // 舊環境保守處理：不要鎖死
+              v._p2kvPlayed = false;
             }
-          } catch (e) {}
+          } catch (e) {
+            v._p2kvPlayed = false;
+          }
 
           // 標記已觸發播放（避免重複嘗試播放）
           v._p2kvPlayed = true;
