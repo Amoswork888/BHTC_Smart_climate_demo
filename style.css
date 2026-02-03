@@ -644,6 +644,7 @@ section {
       bottom: 0;
       width: 100%;
       transform: translateY(0%);
+      overflow: hidden;
 
       img,
       video {
