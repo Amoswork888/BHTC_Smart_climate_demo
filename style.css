@@ -44,6 +44,16 @@ body {
     --percent: 100;
   }
 }
+@keyframes percentangShow {
+  0% {
+    color: transparent;
+    opacity: 0;
+  }
+  100% {
+    color: #fff;
+    opacity: 1;
+  }
+}
 section {
   width: 100%;
   aspect-ratio: 16 / 10;
@@ -452,7 +462,6 @@ section {
     }
   }
 
-  .container-understands,
   .container-multiple-zones {
     .other-info {
       position: absolute;
@@ -467,6 +476,105 @@ section {
       .pic {
         width: 17.55208333vw;
         height: 17.55208333vw;
+
+        &:nth-child(1):after,
+        &:nth-child(2):after {
+          content: "";
+          position: absolute;
+        }
+
+        &:nth-child(1):after {
+        }
+        &:nth-child(2):after {
+        }
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+      }
+    }
+  }
+
+  .container-p2kv {
+    .other-info {
+      position: absolute;
+      top: 14%;
+      width: 100%;
+      z-index: 4;
+      display: flex;
+      justify-content: center;
+      gap: 4vw;
+
+      .pic {
+        position: relative;
+        width: 17.55208333vw;
+        height: 17.55208333vw;
+        opacity: 0;
+
+        &:nth-child(1) {
+          transform: translateY(10%);
+
+          img.pointer {
+            width: 70%;
+          }
+        }
+
+        &:nth-child(2) {
+          transform: translateY(60%) translateX(30%);
+
+          img.pointer {
+            width: 90%;
+          }
+        }
+
+        img.pointer {
+          position: absolute;
+          bottom: 40%;
+          left: 80%;
+        }
+        img:first-child {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+      }
+    }
+
+    &.mv-on {
+      .other-info {
+        .pic {
+          &:nth-child(1) {
+            opacity: 1;
+            transition: opacity 1s 0s;
+          }
+          &:nth-child(2) {
+            opacity: 1;
+            transition: opacity 1s 1s;
+          }
+        }
+      }
+    }
+  }
+
+  .container-understands {
+    .other-info {
+      position: absolute;
+      top: 33%;
+      width: 100%;
+      z-index: 4;
+
+      display: flex;
+      justify-content: center;
+      gap: 0vw;
+
+      .pic {
+        width: 17.55208333vw;
+        height: 17.55208333vw;
+        &:nth-child(2) {
+          transform: translateY(-50%);
+        }
 
         img {
           width: 100%;
@@ -553,6 +661,12 @@ section {
         width: 55%;
         height: auto;
         transition: opacity 1s 0s;
+      }
+      video {
+        width: 90%;
+        position: absolute;
+        bottom: 4%;
+        left: 20%;
       }
     }
 
@@ -750,7 +864,9 @@ section {
       &.done {
         color: #fff;
         transform: translateY(-50%);
-        transition: transform 0.5s, color 0.5s 0.5s;
+        transition:
+          transform 0.5s,
+          color 0.5s 0.5s;
       }
     }
   }
@@ -805,6 +921,14 @@ section {
               calc(var(--ani-time-duration) * 2 + var(--ani-first-delay));
           }
         }
+      }
+
+      .process-done {
+        opacity: 0;
+        animation: percentangShow 0.5s 4s both;
+      }
+      .txt {
+        animation: percentangShow 0.5s 4.5s both;
       }
     }
   }

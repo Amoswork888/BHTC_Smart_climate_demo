@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -22,7 +22,7 @@
         </div>
         <video width="250" loop autoplay muted playsinline preload="auto">
           <source
-            src="video/ADCA-C80_Part_1-1_Car_n_Effects_v0102.webm"
+            src="video/ADCA-C80_Part_1-1_Car_n_Effects_v0113.webm"
             type="video/webm"
           />
           <!-- <source src="/shared-assets/videos/flower.mp4" type="video/mp4" /> -->
@@ -78,6 +78,20 @@
           <div class="car">
             <img src="images/Part_1-2_Car.png" alt="" />
             <img src="images/EVCarRender_v03.png" class="car_ready" alt="" />
+            <!-- 汽車升級星芒 -->
+            <video
+              width="250"
+              muted
+              pause
+              playsinline
+              preload="auto"
+              class="car-star"
+            >
+              <source
+                src="video/ADCA-C80_Part_1-5_Particles_v0101.webm"
+                type="video/webm"
+              />
+            </video>
           </div>
           <div class="light-circle">
             <!-- <img src="images/light-circle.png" alt="" /> -->
@@ -179,12 +193,15 @@
               </div>
             </li>
             <li class="percentang">
-              <video width="250" autoplay muted playsinline preload="auto">
+              <!-- <video width="250" autoplay muted playsinline preload="auto">
                 <source
                   src="video/ADCA-C80_Part_1-4_Percent_v0102.webm"
                   type="video/webm"
                 />
-              </video>
+              </video> -->
+              <div class="process-done">
+                <img src="images/percentage-done.png" alt="" />
+              </div>
               <div class="txt">Process Done</div>
             </li>
           </ul>
@@ -280,7 +297,7 @@
     <!-- part2 ================================================= -->
     <section class="section section-part2">
       <!-- 氣候偵測 -->
-      <div class="container">
+      <div class="container container-p2kv">
         <div class="tag">VIRTUAL SENSORS</div>
         <div class="main-title">
           <h2 class="main-title-l1">
@@ -293,8 +310,18 @@
             climate control.
           </p>
         </div>
+        <div class="other-info">
+          <div class="pic">
+            <img src="images/a_plus_senior_03_new.png" alt="" />
+            <img src="images/pointer-windshield.png" alt="" class="pointer" />
+          </div>
+          <div class="pic">
+            <img src="images/Temp-window-s1.png" alt="" />
+            <img src="images/pointer-window.png" alt="" class="pointer" />
+          </div>
+        </div>
         <div class="bg">
-          <video autoplay loop muted playsinline preload="auto">
+          <video autoplay muted playsinline preload="auto">
             <source
               src="video/ADCA-C80_Part_2-1_VideoBG_v0101.webm"
               type="video/webm"
@@ -319,6 +346,9 @@
         <div class="other-info">
           <div class="pic">
             <img src="images/Temp-driver.png" alt="" />
+          </div>
+          <div class="pic">
+            <img src="images/Temp-windshield.png" alt="" />
           </div>
           <div class="pic">
             <img src="images/Temp-passenger.png" alt="" />
