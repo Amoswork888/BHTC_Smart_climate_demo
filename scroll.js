@@ -13,6 +13,10 @@
   function unlockVideo(video) {
     if (!video || videoUnlocked) return;
 
+    // ⭐ 關鍵：先靜音 + 行動裝置 inline 播放
+    video.muted = true;
+    video.playsInline = true;
+
     const p = video.play();
     if (p && typeof p.then === "function") {
       p.then(() => {
@@ -20,10 +24,9 @@
         try {
           video.currentTime = 0;
         } catch (e) {}
-        videoUnlocked = true; // 成功才鎖定
+        videoUnlocked = true; // 只有真的成功才鎖定
       }).catch(() => {
-        // 失敗就保持可重試
-        videoUnlocked = false;
+        videoUnlocked = false; // 保留重試機會
       });
     }
   }
