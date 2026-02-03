@@ -7,44 +7,168 @@
   const first = containers[0];
   if (!first) return;
 
-  // 添加點一下播放功能，避免自動播放被瀏覽器阻擋
+  // =========
+  // Media utils
+  // =========
+
+  // 全域解鎖旗標：只要任何一支影片成功透過手勢完成一次 play→pause，即視為已解鎖
   let videoUnlocked = false;
 
-  function unlockVideo(video) {
-    if (!video || videoUnlocked) return;
+  // 等待手勢的 Promise（讓 safePlay 在被 autoplay policy 擋住時可掛起等手勢再重試）
+  let _gestureWaitPromise = null;
+  let _resolveGestureWait = null;
 
-    // 先靜音 + 行動裝置 inline 播放
-    video.muted = true;
-    video.playsInline = true;
+  function waitForGestureOnce() {
+    if (_gestureWaitPromise) return _gestureWaitPromise;
 
-    const p = video.play();
-    if (p && typeof p.then === "function") {
-      p.then(() => {
-        video.pause();
+    _gestureWaitPromise = new Promise((resolve) => {
+      _resolveGestureWait = resolve;
+    });
+
+    const onGesture = () => {
+      try {
+        if (_resolveGestureWait) _resolveGestureWait();
+      } finally {
+        _gestureWaitPromise = null;
+        _resolveGestureWait = null;
+        window.removeEventListener("pointerdown", onGesture, true);
+        window.removeEventListener("touchstart", onGesture, true);
+        window.removeEventListener("click", onGesture, true);
+      }
+    };
+
+    // capture: true 讓它更早拿到手勢（某些 WebView 比較挑）
+    window.addEventListener("pointerdown", onGesture, true);
+    window.addEventListener("touchstart", onGesture, true);
+    window.addEventListener("click", onGesture, true);
+
+    return _gestureWaitPromise;
+  }
+
+  function once(el, eventName) {
+    return new Promise((resolve) => {
+      const handler = () => resolve();
+      el.addEventListener(eventName, handler, { once: true });
+    });
+  }
+
+  function isMetadataReady(v) {
+    // HAVE_METADATA = 1
+    return !!v && v.readyState >= 1 && isFinite(v.duration) && v.duration > 0;
+  }
+
+  // 核心：集中播放控制
+  // - requireGesture: 若被 policy 擋，會等待一次手勢後再重試
+  // - ensureMetadata: 若 metadata 未就緒，會等待 loadedmetadata
+  // - unlockMode: 解鎖用（play 一下立刻 pause），成功後 videoUnlocked=true
+  async function safePlay(video, options = {}) {
+    const {
+      requireGesture = true,
+      ensureMetadata = true,
+      unlockMode = false,
+      // 預設用靜音解鎖最保險；正式播放你要不要取消靜音可自行在外面控制
+      forceMutedForUnlock = true,
+      playsInline = true,
+    } = options;
+
+    if (!video) return false;
+
+    try {
+      if (playsInline) video.playsInline = true;
+      if (unlockMode && forceMutedForUnlock) video.muted = true;
+
+      if (ensureMetadata && !isMetadataReady(video)) {
+        await once(video, "loadedmetadata");
+      }
+
+      // 解鎖模式：播放一下就 pause（用來取得播放權限）
+      // 注意：部分環境 pause/seek 可能 throw，所以包 try
+      const p = video.play();
+      if (p && typeof p.then === "function") {
+        await p;
+      }
+
+      if (unlockMode) {
         try {
+          video.pause();
+          // 解鎖時回到 0，避免影響之後播放
           video.currentTime = 0;
         } catch (e) {}
-        videoUnlocked = true; // 只有真的成功才鎖定
-      }).catch(() => {
-        videoUnlocked = false; // 保留重試機會
-      });
+        videoUnlocked = true;
+      }
+
+      return true;
+    } catch (e) {
+      // 可能是 autoplay policy 或其他原因導致 play() 被拒絕
+      if (requireGesture) {
+        // 等一次手勢後重試一次
+        await waitForGestureOnce();
+
+        // 手勢發生後，再試一次（第二次就不要無限重試，避免卡死）
+        try {
+          if (playsInline) video.playsInline = true;
+          if (unlockMode && forceMutedForUnlock) video.muted = true;
+          if (ensureMetadata && !isMetadataReady(video)) {
+            await once(video, "loadedmetadata");
+          }
+          const p2 = video.play();
+          if (p2 && typeof p2.then === "function") {
+            await p2;
+          }
+
+          if (unlockMode) {
+            try {
+              video.pause();
+              video.currentTime = 0;
+            } catch (e2) {}
+            videoUnlocked = true;
+          }
+
+          return true;
+        } catch (e2) {
+          return false;
+        }
+      }
+
+      return false;
     }
   }
 
-  // 任何一次手勢都算：pointerdown（改成可重試，成功後自動不再做事）
-  window.addEventListener(
-    "pointerdown",
-    () => {
-      if (videoUnlocked) return;
-      const v = first.querySelector(".sys-progress .percentang video");
-      unlockVideo(v);
-    },
-    { passive: true },
-  );
+  // =========
+  // 解鎖：任意一次手勢嘗試解鎖一次（失敗不鎖死，下一次手勢還能再試）
+  // =========
+  function tryUnlockFromGesture() {
+    if (videoUnlocked) return;
+
+    // 你原本是挑 percentang video 來解鎖：保留
+    const v = first.querySelector(".sys-progress .percentang video");
+    // 重要：解鎖要走 safePlay 的 unlockMode
+    safePlay(v, {
+      unlockMode: true,
+      ensureMetadata: false, // 解鎖不一定要等 duration
+      requireGesture: false, // 已在手勢事件中
+      forceMutedForUnlock: true,
+      playsInline: true,
+    }).then((ok) => {
+      // ok=true 代表解鎖成功，之後不必再做事
+      // 失敗則保持可重試（不做任何事）
+      if (ok) {
+        // 成功後可選擇移除 listener（若你希望仍可重試某些影片，可不移除）
+        // 這裡採保守：成功後移除，避免多餘觸發
+        window.removeEventListener("pointerdown", tryUnlockFromGesture, true);
+      }
+    });
+  }
+
+  // capture: true 讓這次 pointerdown 更像「有效手勢」
+  window.addEventListener("pointerdown", tryUnlockFromGesture, true);
+
+  // =========
+  // Layout / scroll logic（保留原本）
+  // =========
 
   let firstHeight = first.offsetHeight || first.getBoundingClientRect().height;
 
-  // firstHeight * 6
   function setSectionHeight() {
     firstHeight = first.offsetHeight || first.getBoundingClientRect().height;
     section.style.height = firstHeight * 6 + "px";
@@ -55,26 +179,16 @@
   let lastActive = null;
   let _myOffsetTop = 400;
 
-  // 判斷影片剩餘幾秒時視為「倒數」，可於此修改（單位：秒）
+  // 判斷影片剩餘幾秒時視為「倒數」
   const mvCountdownSeconds = 2;
 
-  // 用來記錄上一次的捲軸位置，以判斷是往上或往下捲動（初始化）
+  // 用來記錄上一次的捲軸位置，以判斷方向
   let previousScrollY = window.scrollY || window.pageYOffset;
 
-  /**
-   * 取得目前的垂直捲軸位置（cross-browser）
-   * @returns {number} 當前 scrollY
-   */
   function getScrollY() {
     return window.scrollY || window.pageYOffset;
   }
 
-  /**
-   * 取得捲動方向並更新 previousScrollY
-   * 回傳： 1 表示往下捲動、-1 表示往上捲動、0 表示未改變
-   *
-   * 注意：此函式會更新 `previousScrollY`，每個 rAF 週期請只呼叫一次以避免競態
-   */
   function getScrollDirection() {
     const scrollY = getScrollY();
     let dir = 0;
@@ -84,21 +198,6 @@
     return dir;
   }
 
-  /**
-   * 便利函式：是否正在往下捲動（會呼叫 getScrollDirection() 並回傳 bool）
-   * 若需避免更新 previousScrollY，請直接呼叫 getScrollDirection() 並自行處理回傳值
-   */
-  function isScrollingDown() {
-    return getScrollDirection() === 1;
-  }
-
-  /**
-   * 便利函式：是否正在往上捲動（會呼叫 getScrollDirection() 並回傳 bool）
-   */
-  function isScrollingUp() {
-    return getScrollDirection() === -1;
-  }
-
   // 找出頁面中所有 .container-p2kv，並準備對應的影片控制 flag
   const p2kvContainers = Array.from(
     document.querySelectorAll(".container-p2kv"),
@@ -106,16 +205,8 @@
   p2kvContainers.forEach((c) => {
     const v = c.querySelector("video");
     if (v) {
-      // 自訂屬性用來記錄是否已依規則播放過
       v._p2kvPlayed = false;
-      // 確保 metadata 載入時可以做必要的初始化（若需要）
-      v.addEventListener(
-        "loadedmetadata",
-        () => {
-          // 目前不需額外處理，但保留以防未來擴充
-        },
-        { once: true },
-      );
+      v.addEventListener("loadedmetadata", () => {}, { once: true });
     }
   });
 
@@ -157,12 +248,12 @@
 
   /**
    * 處理 .container-p2kv 的捲軸與影片邏輯：
-   * - 當往下捲動 且 捲軸位置到達（元素頂端 - 300px）時，該元素內的 video 播放
-   * - 當往上捲動 且 元素頂端到達視窗底部（>= 100vh）時，該元素內的 video 時間軸回到 0s 並暫停
+   * - 往下捲動且到達門檻 → 播放（safePlay）
+   * - 往上捲動且元素頂端到視窗底部 → pause + reset
    */
   function handleP2KVScroll() {
     const scrollY = getScrollY();
-    const direction = getScrollDirection(); // 1: down, -1: up, 0: no change
+    const direction = getScrollDirection(); // 1: down, -1: up
     const scrollingDown = direction === 1;
     const scrollingUp = direction === -1;
     const viewportHeight = window.innerHeight;
@@ -172,41 +263,27 @@
       if (!v) return;
 
       const rect = c.getBoundingClientRect();
-      const elemTop = rect.top + scrollY; // 元素相對文件上方的位置
+      const elemTop = rect.top + scrollY;
 
-      // 向下捲動：當卷軸往下捲到 .container-p2kv 頂端 - 300px 時，播放影片（只播放一次，避免重複觸發）
-      // 同時為容器加上 .mv-on 樣式（代表影片正在透過捲軸被觸發播放）
       if (scrollingDown && scrollY >= elemTop - 300) {
         if (!v._p2kvPlayed) {
-          try {
-            const p = v.play();
-            if (p && typeof p.then === "function") {
-              p.then(() => {
-                // 播放成功，才標記已播放
-                v._p2kvPlayed = true;
-              }).catch(() => {
-                // 播放失敗，保留重試機會
-                v._p2kvPlayed = false;
-              });
-            } else {
-              // 舊環境保守處理：不要鎖死
-              v._p2kvPlayed = false;
-            }
-          } catch (e) {
-            v._p2kvPlayed = false;
-          }
+          // 用 safePlay：若被擋會等手勢後重試；成功才設 _p2kvPlayed=true
+          safePlay(v, {
+            requireGesture: true,
+            ensureMetadata: true,
+            unlockMode: false,
+            playsInline: true,
+          }).then((ok) => {
+            v._p2kvPlayed = !!ok;
+          });
 
-          // 標記已觸發播放（避免重複嘗試播放）
-          v._p2kvPlayed = true;
-
-          // 監聽播放進度，動態偵測何時只剩下 mvCountdownSeconds 秒或更少
+          // 監聽播放進度：倒數時加 mv-on
           const onTimeUpdate = () => {
             try {
               const dur = v.duration;
               if (!isFinite(dur) || dur <= 0) return;
               const remaining = dur - v.currentTime;
               if (remaining <= mvCountdownSeconds) {
-                // 當剩餘時間 <= mvCountdownSeconds 時加入 .mv-on，並移除監聽以避免重複觸發
                 try {
                   c.classList.add("mv-on");
                 } catch (e) {}
@@ -217,7 +294,7 @@
 
           v.addEventListener("timeupdate", onTimeUpdate);
 
-          // 保險：若目前已在倒數 mvCountdownSeconds 範圍（例如短片或已播放到末段），立即加上並移除監聽
+          // 保險：若本來就已接近尾端
           try {
             if (
               isFinite(v.duration) &&
@@ -230,8 +307,6 @@
         }
       }
 
-      // 向上捲動：當元素頂端到達視窗底部（>= 100vh）時，重置影片時間到 0s 並暫停
-      // 同時移除 .mv-on，代表影片不再處於捲軸觸發播放狀態
       if (scrollingUp && rect.top >= viewportHeight) {
         try {
           v.pause();
@@ -250,7 +325,6 @@
       requestAnimationFrame(() => {
         handleScroll();
         handleBackToTop();
-        // 新增：同一個 rAF 內處理 .container-p2kv 的影片控制，保持效能
         handleP2KVScroll();
         ticking = false;
       });
@@ -263,13 +337,12 @@
   window.addEventListener("resize", () => {
     setSectionHeight();
     handleScroll();
-    // 調整視窗大小時也要檢查 .container-p2kv 的狀態
     handleP2KVScroll();
   });
+
   window.addEventListener("load", () => {
     setSectionHeight();
     handleScroll();
-    // 頁面載入完成後也執行一次 P2KV 檢查
     handleP2KVScroll();
   });
 
@@ -279,30 +352,35 @@
       m.addEventListener("loadedmetadata", () => {
         setSectionHeight();
         handleScroll();
-        // 影片 metadata 載入後也需判斷 .container-p2kv 的播放條件
         handleP2KVScroll();
       });
     } else {
       m.addEventListener("load", () => {
         setSectionHeight();
         handleScroll();
-        // 圖片載入後亦需檢查（避免視高變動導致判斷錯誤）
         handleP2KVScroll();
       });
     }
   });
 
+  // percentangVideo：保留你的初始化（pause + currentTime 0.05）
+  // 但一樣避免在 metadata 前動它
   const percentangVideo = first.querySelector(
     ".sys-progress .percentang video",
   );
   if (percentangVideo) {
+    percentangVideo.playsInline = true;
     percentangVideo.addEventListener("loadedmetadata", () => {
-      percentangVideo.pause();
       try {
+        percentangVideo.pause();
         percentangVideo.currentTime = 0.05;
       } catch (e) {}
     });
   }
+
+  // =========
+  // S3 logic（把 play 改用 safePlay）
+  // =========
 
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
@@ -315,13 +393,12 @@
       }
     });
   });
-
   observer.observe(first, { attributes: true, attributeFilter: ["class"] });
 
   let s3Running = false;
 
   function handleS3() {
-    // 改為使用主車的星芒影片作為觸發控制（class: .car-star）
+    // 主車星芒影片 car-star
     const video = first.querySelector(".main-car .car video.car-star");
     const percentang = first.querySelector(".sys-progress .percentang");
     if (!video || !percentang) return;
@@ -330,18 +407,23 @@
       video.currentTime = 0.05;
     } catch (e) {}
 
-    // 當 .s3 發生後，監聽 .percentang 的 class 變化（關注 .done 是否被加入），
-    // 當偵測到 .done 時，啟動主車的星芒影片（.car-star）播放
+    // 當 .s3 發生後，監聽 .percentang 的 class 變化（關注 .done）
     if (!percentang._doneObserverAttached) {
       const playStar = () => {
-        try {
-          const video_carStar = first.querySelector(
-            ".main-car .car video.car-star",
-          );
-          if (!video_carStar) return;
-          const pr = video_carStar.play();
-          if (pr && typeof pr.then === "function") pr.catch(() => {});
-        } catch (e) {}
+        const video_carStar = first.querySelector(
+          ".main-car .car video.car-star",
+        );
+        if (!video_carStar) return;
+
+        // 用 safePlay 統一處理
+        safePlay(video_carStar, {
+          requireGesture: true,
+          ensureMetadata: true,
+          unlockMode: false,
+          playsInline: true,
+        }).then((ok) => {
+          // 若播放被擋也不做事，等待下一次條件或使用者手勢
+        });
       };
 
       const onPercentangClassChange = (mutations) => {
@@ -367,7 +449,6 @@
         }
       };
 
-      // 建立 observer
       const doneObserver = new MutationObserver(onPercentangClassChange);
       doneObserver.observe(percentang, {
         attributes: true,
@@ -376,7 +457,7 @@
       percentang._doneObserver = doneObserver;
       percentang._doneObserverAttached = true;
 
-      // 保險 fallback：若 class 沒被加入，則在超時後強制播放（避免卡死）
+      // fallback：超時後強制播（仍走 safePlay）
       percentang._doneFallbackTimer = setTimeout(() => {
         try {
           if (s3Running) return;
@@ -394,6 +475,7 @@
       }, 5000);
     }
 
+    // 這裡你是用 car-star 的 ended 去觸發右側 fadeout + done
     video.onended = () => {
       const liElements = first.querySelectorAll(
         ".sys-progress .function-list li:not(.percentang)",
@@ -405,7 +487,7 @@
         s3Running = false;
       };
 
-      // ✅ 保險：避免 transitionend 沒觸發造成卡死
+      // 保險：避免 transitionend 沒觸發造成卡死
       const safetyTimer = setTimeout(done, 800);
 
       liElements.forEach((li) => {
@@ -426,6 +508,9 @@
         );
       });
     };
+
+    // 你原本 handleS3 沒有在進 s3 時立即播放 car-star（而是等待 done），
+    // 這裡維持原設計，不額外自動播放。
   }
 
   function clearLiStyles() {
@@ -441,7 +526,6 @@
     });
     percentang.classList.remove("done");
 
-    // 清除主車星芒影片的播放狀態（若存在）
     const video_carStar = first.querySelector(".main-car .car video.car-star");
     if (video_carStar) {
       video_carStar.pause();
@@ -454,6 +538,5 @@
   }
 
   handleScroll();
-  // 初始化時一併檢查並觸發 .container-p2kv 的影片控制
   handleP2KVScroll();
 })();
