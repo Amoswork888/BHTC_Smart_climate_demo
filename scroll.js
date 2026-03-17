@@ -7,6 +7,9 @@
   const first = containers[0];
   if (!first) return;
 
+  // 滾動激活閾值：元素頂部距離視窗頂部 <= 此值時添加 .active
+  const ACTIVE_THRESHOLD = 200;
+
   // =========
   // Media utils
   // =========
@@ -320,12 +323,140 @@
     });
   }
 
+  function handleP2KVActive() {
+    const p2kv = document.querySelector(".container-p2kv");
+    if (!p2kv) return;
+
+    const rect = p2kv.getBoundingClientRect();
+    if (rect.top <= ACTIVE_THRESHOLD) {
+      p2kv.classList.add("active");
+    } else {
+      p2kv.classList.remove("active");
+    }
+  }
+
+  function handleEndSlogan() {
+    const endSlogan = document.querySelector(".container-end-slogan");
+    if (!endSlogan) return;
+
+    const rect = endSlogan.getBoundingClientRect();
+    if (rect.top <= ACTIVE_THRESHOLD) {
+      endSlogan.classList.add("active");
+    } else {
+      endSlogan.classList.remove("active");
+    }
+  }
+
+  function handleFirstSlogan() {
+    const firstSlogan = document.querySelector(".container-first-slogan");
+    if (!firstSlogan) return;
+
+    const rect = firstSlogan.getBoundingClientRect();
+    if (rect.top <= ACTIVE_THRESHOLD) {
+      firstSlogan.classList.add("active");
+    } else {
+      firstSlogan.classList.remove("active");
+    }
+  }
+  function handleUnderstands() {
+    const understands = document.querySelector(".container-understands");
+    if (!understands) return;
+
+    const rect = understands.getBoundingClientRect();
+    if (rect.top <= ACTIVE_THRESHOLD) {
+      understands.classList.add("active");
+    } else {
+      understands.classList.remove("active");
+    }
+  }
+
+  function handleComfort() {
+    const comfort = document.querySelector(".container-comfort");
+    if (!comfort) return;
+
+    const rect = comfort.getBoundingClientRect();
+    if (rect.top <= ACTIVE_THRESHOLD) {
+      comfort.classList.add("active");
+    } else {
+      comfort.classList.remove("active");
+    }
+  }
+
+  function handleListens() {
+    const listens = document.querySelector(".container-listens");
+    if (!listens) return;
+
+    const rect = listens.getBoundingClientRect();
+    if (rect.top <= ACTIVE_THRESHOLD) {
+      listens.classList.add("active");
+    } else {
+      listens.classList.remove("active");
+    }
+  }
+
+  function handleMultipleZones() {
+    const multipleZones = document.querySelector(".container-multiple-zones");
+    if (!multipleZones) return;
+
+    const rect = multipleZones.getBoundingClientRect();
+    if (rect.top <= ACTIVE_THRESHOLD) {
+      multipleZones.classList.add("active");
+    } else {
+      multipleZones.classList.remove("active");
+    }
+  }
+
+  function handleCanFeel() {
+    const canFeel = document.querySelector(".container-can-feel");
+    if (!canFeel) return;
+
+    const rect = canFeel.getBoundingClientRect();
+    if (rect.top <= ACTIVE_THRESHOLD) {
+      canFeel.classList.add("active");
+    } else {
+      canFeel.classList.remove("active");
+    }
+  }
+
+  function handleNextDay() {
+    const nextDay = document.querySelector(".container-next-day");
+    if (!nextDay) return;
+
+    const rect = nextDay.getBoundingClientRect();
+    if (rect.top <= ACTIVE_THRESHOLD) {
+      nextDay.classList.add("active");
+    } else {
+      nextDay.classList.remove("active");
+    }
+  }
+
+  function handleEngineered() {
+    const engineered = document.querySelector(".container-Engineered");
+    if (!engineered) return;
+
+    const rect = engineered.getBoundingClientRect();
+    if (rect.top <= ACTIVE_THRESHOLD) {
+      engineered.classList.add("active");
+    } else {
+      engineered.classList.remove("active");
+    }
+  }
   function onScroll() {
     if (!ticking) {
       requestAnimationFrame(() => {
         handleScroll();
         handleBackToTop();
         handleP2KVScroll();
+        handleP2KVActive();
+        handleFirstSlogan();
+        handleUnderstands();
+        handleComfort();
+        handleListens();
+        handleMultipleZones();
+        handleCanFeel();
+        handleNextDay();
+        handleEngineered();
+        handleEndSlogan();
         ticking = false;
       });
       ticking = true;
@@ -338,12 +469,32 @@
     setSectionHeight();
     handleScroll();
     handleP2KVScroll();
+    handleP2KVActive();
+    handleFirstSlogan();
+    handleUnderstands();
+    handleComfort();
+    handleListens();
+    handleMultipleZones();
+    handleCanFeel();
+    handleNextDay();
+    handleEngineered();
+    handleEndSlogan();
   });
 
   window.addEventListener("load", () => {
     setSectionHeight();
     handleScroll();
     handleP2KVScroll();
+    handleP2KVActive();
+    handleFirstSlogan();
+    handleUnderstands();
+    handleComfort();
+    handleListens();
+    handleMultipleZones();
+    handleCanFeel();
+    handleNextDay();
+    handleEngineered();
+    handleEndSlogan();
   });
 
   const media = first.querySelectorAll("img, video");
@@ -353,12 +504,14 @@
         setSectionHeight();
         handleScroll();
         handleP2KVScroll();
+        handleP2KVActive();
       });
     } else {
       m.addEventListener("load", () => {
         setSectionHeight();
         handleScroll();
         handleP2KVScroll();
+        handleP2KVActive();
       });
     }
   });
@@ -475,7 +628,7 @@
       }, 5000);
     }
 
-    // 這裡你是用 car-star 的 ended 去觸發右側 fadeout + done
+    // 用 car-star 的 ended 去觸發右側 fadeout + done
     video.onended = () => {
       const liElements = first.querySelectorAll(
         ".sys-progress .function-list li:not(.percentang)",
@@ -509,7 +662,7 @@
       });
     };
 
-    // 你原本 handleS3 沒有在進 s3 時立即播放 car-star（而是等待 done），
+    //  handleS3 沒有在進 s3 時立即播放 car-star（而是等待 done）
     // 這裡維持原設計，不額外自動播放。
   }
 
@@ -539,4 +692,46 @@
 
   handleScroll();
   handleP2KVScroll();
+  handleFirstSlogan();
+  handleUnderstands();
+  handleComfort();
+  handleListens();
+  handleMultipleZones();
+  handleCanFeel();
+  handleNextDay();
+  handleEngineered();
+  handleEndSlogan();
+
+  // 當 .section-part2 內的 .container 加入 .active 時，延遲播放 .other-info video
+  // 往回捲動移除 .active 時，重置影片
+  const part2Containers = document.querySelectorAll(
+    ".section-part2 .container",
+  );
+  part2Containers.forEach((container) => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (
+          mutation.type === "attributes" &&
+          mutation.attributeName === "class"
+        ) {
+          const video = container.querySelector(".other-info video");
+          if (!video) return;
+          if (container.classList.contains("active")) {
+            // 加入 .active 時，1秒後播放
+            setTimeout(() => {
+              video.play().catch((e) => console.log("Video play failed:", e));
+            }, 1500);
+          } else {
+            // 移除 .active 時，重設播放頭
+            video.pause();
+            video.currentTime = 0;
+          }
+        }
+      });
+    });
+    observer.observe(container, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+  });
 })();
