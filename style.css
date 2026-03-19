@@ -1260,6 +1260,7 @@ section {
   z-index: 1000;
 
   a {
+    display: none;
     width: 40px;
     aspect-ratio: 1/1;
     font-size: 0;
@@ -1284,6 +1285,14 @@ section {
         transform: scale(0.5);
       }
     }
+  }
+  a:nth-child(1),
+  a:nth-child(2),
+  a:nth-child(7),
+  a:nth-child(11),
+  a:nth-child(15),
+  a:nth-child(16) {
+    display: block;
   }
 }
 .anchor-list {
