@@ -849,3 +849,52 @@
   // Initialize on load
   window.addEventListener("load", activateClosestAnchor);
 })();
+
+// scroll-icon visibility control
+(function () {
+  const scrollIcon = document.querySelector(".scroll-icon");
+  if (!scrollIcon) return;
+
+  // Set transition for fade in/out
+  scrollIcon.style.transition = "opacity 1s ease";
+
+  let scrollTimer = null;
+  let fadeInTimer = null;
+
+  // Function to hide scroll icon
+  function hideScrollIcon() {
+    scrollIcon.style.opacity = "0";
+  }
+
+  // Function to show scroll icon with fade in
+  function showScrollIcon() {
+    scrollIcon.style.opacity = "1";
+  }
+
+  // Scroll event
+  window.addEventListener(
+    "scroll",
+    function () {
+      // Hide immediately on scroll
+      hideScrollIcon();
+
+      // Clear previous timers
+      clearTimeout(scrollTimer);
+      clearTimeout(fadeInTimer);
+
+      // Set timer for scroll stop
+      scrollTimer = setTimeout(function () {
+        // Wait 5s after scroll stops, then fade in
+        fadeInTimer = setTimeout(function () {
+          showScrollIcon();
+        }, 5000);
+      }, 150); // Scroll stop delay
+    },
+    { passive: true },
+  );
+
+  // Initialize: show on load
+  window.addEventListener("load", function () {
+    showScrollIcon();
+  });
+})();
