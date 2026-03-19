@@ -441,6 +441,40 @@
       engineered.classList.remove("active");
     }
   }
+
+  function handleNav2AnchorActive() {
+    const navAnchors = document.querySelectorAll(".nav2anchor a");
+    if (!navAnchors.length) return;
+
+    const scrollY = window.scrollY || window.pageYOffset;
+    let closestAnchor = null;
+    let minDistance = Infinity;
+
+    navAnchors.forEach((anchor) => {
+      const href = anchor.getAttribute("href");
+      if (href && href.startsWith("#")) {
+        const id = href.substring(1);
+        const targetDiv = document.getElementById(id);
+        if (targetDiv) {
+          const rect = targetDiv.getBoundingClientRect();
+          const targetTop = rect.top + scrollY;
+          const distance = Math.abs(scrollY - targetTop);
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestAnchor = anchor;
+          }
+        }
+      }
+    });
+
+    // 移除所有 active
+    navAnchors.forEach((anchor) => anchor.classList.remove("active"));
+    // 添加 active 到最靠近的
+    if (closestAnchor) {
+      closestAnchor.classList.add("active");
+    }
+  }
+
   function onScroll() {
     if (!ticking) {
       requestAnimationFrame(() => {
@@ -457,6 +491,7 @@
         handleNextDay();
         handleEngineered();
         handleEndSlogan();
+        handleNav2AnchorActive();
         ticking = false;
       });
       ticking = true;
@@ -479,6 +514,7 @@
     handleNextDay();
     handleEngineered();
     handleEndSlogan();
+    handleNav2AnchorActive();
   });
 
   window.addEventListener("load", () => {
@@ -495,6 +531,7 @@
     handleNextDay();
     handleEngineered();
     handleEndSlogan();
+    handleNav2AnchorActive();
   });
 
   const media = first.querySelectorAll("img, video");
@@ -729,9 +766,135 @@
         }
       });
     });
-    observer.observe(container, {
-      attributes: true,
-      attributeFilter: ["class"],
+  });
+})();
+
+// nav2anchor click events and scroll stop detection
+(function () {
+  const navAnchors = document.querySelectorAll(".nav2anchor a");
+  let scrollTimer = null;
+  let isFromScrollStop = false;
+
+  // Function to find the closest anchor based on scroll position
+  function findClosestAnchor() {
+    const scrollY = window.scrollY;
+    let closestAnchor = null;
+    let minDistance = Infinity;
+
+    navAnchors.forEach((anchor) => {
+      const href = anchor.getAttribute("href");
+      if (href && href.startsWith("#")) {
+        const id = href.substring(1);
+        const target = document.getElementById(id);
+        if (target) {
+          const rect = target.getBoundingClientRect();
+          const targetTop = rect.top + scrollY;
+          const distance = Math.abs(scrollY - targetTop);
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestAnchor = anchor;
+          }
+        }
+      }
     });
+
+    return closestAnchor;
+  }
+
+  // Function to activate the closest anchor by clicking it
+  function activateClosestAnchor() {
+    const closest = findClosestAnchor();
+    if (closest) {
+      isFromScrollStop = true;
+      closest.click();
+      isFromScrollStop = false;
+    }
+  }
+
+  // Click events
+  navAnchors.forEach((anchor) => {
+    anchor.addEventListener("click", function () {
+      // Remove .active from all anchors
+      navAnchors.forEach((a) => a.classList.remove("active"));
+      // Add .active to the clicked anchor
+      this.classList.add("active");
+
+      // Scroll to anchor only if not from scroll stop
+      if (!isFromScrollStop) {
+        const href = this.getAttribute("href");
+        if (href && href.startsWith("#")) {
+          const id = href.substring(1);
+          const target = document.getElementById(id);
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth" });
+          }
+        }
+      }
+    });
+  });
+
+  // Scroll event to detect scroll stop
+  window.addEventListener(
+    "scroll",
+    function () {
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(function () {
+        // Scroll has stopped, activate closest anchor
+        activateClosestAnchor();
+      }, 150); // Adjust delay as needed
+    },
+    { passive: true },
+  );
+
+  // Initialize on load
+  window.addEventListener("load", activateClosestAnchor);
+})();
+
+// scroll-icon visibility control
+(function () {
+  const scrollIcon = document.querySelector(".scroll-icon");
+  if (!scrollIcon) return;
+
+  // Set transition for fade in/out
+  scrollIcon.style.transition = "opacity 1s ease";
+
+  let scrollTimer = null;
+  let fadeInTimer = null;
+
+  // Function to hide scroll icon
+  function hideScrollIcon() {
+    scrollIcon.style.opacity = "0";
+  }
+
+  // Function to show scroll icon with fade in
+  function showScrollIcon() {
+    scrollIcon.style.opacity = "1";
+  }
+
+  // Scroll event
+  window.addEventListener(
+    "scroll",
+    function () {
+      // Hide immediately on scroll
+      hideScrollIcon();
+
+      // Clear previous timers
+      clearTimeout(scrollTimer);
+      clearTimeout(fadeInTimer);
+
+      // Set timer for scroll stop
+      scrollTimer = setTimeout(function () {
+        // Wait 5s after scroll stops, then fade in
+        fadeInTimer = setTimeout(function () {
+          showScrollIcon();
+        }, 5000);
+      }, 150); // Scroll stop delay
+    },
+    { passive: true },
+  );
+
+  // Initialize: show on load
+  window.addEventListener("load", function () {
+    showScrollIcon();
   });
 })();
