@@ -467,7 +467,7 @@
       }
     });
 
-    // 移除所有 active
+    // 移除所有 anchor active
     navAnchors.forEach((anchor) => anchor.classList.remove("active"));
     // 添加 active 到最靠近的
     if (closestAnchor) {
@@ -754,17 +754,40 @@
           const video = container.querySelector(".other-info video");
           if (!video) return;
           if (container.classList.contains("active")) {
+            console.log(
+              "Container activated, scheduling video play in 1s for:",
+              container,
+            );
             // 加入 .active 時，1秒後播放
             setTimeout(() => {
-              video.play().catch((e) => console.log("Video play failed:", e));
-            }, 1500);
+              console.log("Attempting to play video for:", container);
+              video
+                .play()
+                .then(() => {
+                  console.log(
+                    "Video started playing successfully for:",
+                    container,
+                  );
+                })
+                .catch((e) => {
+                  console.log("Video play failed:", e, "for:", container);
+                });
+            }, 1000);
           } else {
+            console.log(
+              "Container deactivated, pausing and resetting video for:",
+              container,
+            );
             // 移除 .active 時，重設播放頭
             video.pause();
             video.currentTime = 0;
           }
         }
       });
+    });
+    observer.observe(container, {
+      attributes: true,
+      attributeFilter: ["class"],
     });
   });
 })();
@@ -773,7 +796,6 @@
 (function () {
   const navAnchors = document.querySelectorAll(".nav2anchor a");
   let scrollTimer = null;
-  let isFromScrollStop = false;
 
   // Function to find the closest anchor based on scroll position
   function findClosestAnchor() {
@@ -801,35 +823,36 @@
     return closestAnchor;
   }
 
-  // Function to activate the closest anchor by clicking it
+  // Unified function to set active anchor with setTimeout
+  function setActive(anchor) {
+    setTimeout(() => {
+      navAnchors.forEach((a) => a.classList.remove("active"));
+      anchor.classList.add("active");
+    }, 0);
+  }
+
+  // Function to activate the closest anchor
   function activateClosestAnchor() {
     const closest = findClosestAnchor();
     if (closest) {
-      isFromScrollStop = true;
-      closest.click();
-      isFromScrollStop = false;
+      setActive(closest);
     }
   }
 
   // Click events
   navAnchors.forEach((anchor) => {
     anchor.addEventListener("click", function () {
-      // Remove .active from all anchors
-      navAnchors.forEach((a) => a.classList.remove("active"));
-      // Add .active to the clicked anchor
-      this.classList.add("active");
-
-      // Scroll to anchor only if not from scroll stop
-      if (!isFromScrollStop) {
-        const href = this.getAttribute("href");
-        if (href && href.startsWith("#")) {
-          const id = href.substring(1);
-          const target = document.getElementById(id);
-          if (target) {
-            target.scrollIntoView({ behavior: "smooth" });
-          }
+      // Scroll to anchor
+      const href = this.getAttribute("href");
+      if (href && href.startsWith("#")) {
+        const id = href.substring(1);
+        const target = document.getElementById(id);
+        if (target) {
+          target.scrollIntoView({ behavior: "smooth" });
         }
       }
+
+      setActive(this);
     });
   });
 
@@ -850,7 +873,7 @@
   window.addEventListener("load", activateClosestAnchor);
 })();
 
-// scroll-icon visibility control
+// scroll-icon 顯示控制
 (function () {
   const scrollIcon = document.querySelector(".scroll-icon");
   if (!scrollIcon) return;
