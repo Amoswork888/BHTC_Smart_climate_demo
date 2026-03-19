@@ -441,6 +441,40 @@
       engineered.classList.remove("active");
     }
   }
+
+  function handleNav2AnchorActive() {
+    const navAnchors = document.querySelectorAll(".nav2anchor a");
+    if (!navAnchors.length) return;
+
+    const scrollY = window.scrollY || window.pageYOffset;
+    let closestAnchor = null;
+    let minDistance = Infinity;
+
+    navAnchors.forEach((anchor) => {
+      const href = anchor.getAttribute("href");
+      if (href && href.startsWith("#")) {
+        const id = href.substring(1);
+        const targetDiv = document.getElementById(id);
+        if (targetDiv) {
+          const rect = targetDiv.getBoundingClientRect();
+          const targetTop = rect.top + scrollY;
+          const distance = Math.abs(scrollY - targetTop);
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestAnchor = anchor;
+          }
+        }
+      }
+    });
+
+    // 移除所有 active
+    navAnchors.forEach((anchor) => anchor.classList.remove("active"));
+    // 添加 active 到最靠近的
+    if (closestAnchor) {
+      closestAnchor.classList.add("active");
+    }
+  }
+
   function onScroll() {
     if (!ticking) {
       requestAnimationFrame(() => {
@@ -457,6 +491,7 @@
         handleNextDay();
         handleEngineered();
         handleEndSlogan();
+        handleNav2AnchorActive();
         ticking = false;
       });
       ticking = true;
@@ -479,6 +514,7 @@
     handleNextDay();
     handleEngineered();
     handleEndSlogan();
+    handleNav2AnchorActive();
   });
 
   window.addEventListener("load", () => {
@@ -495,6 +531,7 @@
     handleNextDay();
     handleEngineered();
     handleEndSlogan();
+    handleNav2AnchorActive();
   });
 
   const media = first.querySelectorAll("img, video");
@@ -729,9 +766,18 @@
         }
       });
     });
-    observer.observe(container, {
-      attributes: true,
-      attributeFilter: ["class"],
+  });
+})();
+
+// nav2anchor click events
+(function () {
+  const navAnchors = document.querySelectorAll(".nav2anchor a");
+  navAnchors.forEach((anchor) => {
+    anchor.addEventListener("click", function () {
+      // Remove .active from all anchors
+      navAnchors.forEach((a) => a.classList.remove("active"));
+      // Add .active to the clicked anchor
+      this.classList.add("active");
     });
   });
 })();
