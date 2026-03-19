@@ -769,15 +769,83 @@
   });
 })();
 
-// nav2anchor click events
+// nav2anchor click events and scroll stop detection
 (function () {
   const navAnchors = document.querySelectorAll(".nav2anchor a");
+  let scrollTimer = null;
+  let isFromScrollStop = false;
+
+  // Function to find the closest anchor based on scroll position
+  function findClosestAnchor() {
+    const scrollY = window.scrollY;
+    let closestAnchor = null;
+    let minDistance = Infinity;
+
+    navAnchors.forEach((anchor) => {
+      const href = anchor.getAttribute("href");
+      if (href && href.startsWith("#")) {
+        const id = href.substring(1);
+        const target = document.getElementById(id);
+        if (target) {
+          const rect = target.getBoundingClientRect();
+          const targetTop = rect.top + scrollY;
+          const distance = Math.abs(scrollY - targetTop);
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestAnchor = anchor;
+          }
+        }
+      }
+    });
+
+    return closestAnchor;
+  }
+
+  // Function to activate the closest anchor by clicking it
+  function activateClosestAnchor() {
+    const closest = findClosestAnchor();
+    if (closest) {
+      isFromScrollStop = true;
+      closest.click();
+      isFromScrollStop = false;
+    }
+  }
+
+  // Click events
   navAnchors.forEach((anchor) => {
     anchor.addEventListener("click", function () {
       // Remove .active from all anchors
       navAnchors.forEach((a) => a.classList.remove("active"));
       // Add .active to the clicked anchor
       this.classList.add("active");
+
+      // Scroll to anchor only if not from scroll stop
+      if (!isFromScrollStop) {
+        const href = this.getAttribute("href");
+        if (href && href.startsWith("#")) {
+          const id = href.substring(1);
+          const target = document.getElementById(id);
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth" });
+          }
+        }
+      }
     });
   });
+
+  // Scroll event to detect scroll stop
+  window.addEventListener(
+    "scroll",
+    function () {
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(function () {
+        // Scroll has stopped, activate closest anchor
+        activateClosestAnchor();
+      }, 150); // Adjust delay as needed
+    },
+    { passive: true },
+  );
+
+  // Initialize on load
+  window.addEventListener("load", activateClosestAnchor);
 })();
