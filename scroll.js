@@ -796,6 +796,7 @@
 (function () {
   const navAnchors = document.querySelectorAll(".nav2anchor a");
   let scrollTimer = null;
+  let isSettingActive = false;
 
   // Function to find the closest anchor based on scroll position
   function findClosestAnchor() {
@@ -824,10 +825,16 @@
   }
 
   // Unified function to set active anchor with setTimeout
-  function setActive(anchor) {
+  function setActive(anchor, triggerClick = false) {
+    if (isSettingActive) return;
+    isSettingActive = true;
     setTimeout(() => {
       navAnchors.forEach((a) => a.classList.remove("active"));
       anchor.classList.add("active");
+      if (triggerClick) {
+        anchor.click();
+      }
+      isSettingActive = false;
     }, 0);
   }
 
@@ -835,13 +842,14 @@
   function activateClosestAnchor() {
     const closest = findClosestAnchor();
     if (closest) {
-      setActive(closest);
+      setActive(closest, true);
     }
   }
 
   // Click events
   navAnchors.forEach((anchor) => {
     anchor.addEventListener("click", function () {
+      if (isSettingActive) return;
       // Scroll to anchor
       const href = this.getAttribute("href");
       if (href && href.startsWith("#")) {
@@ -852,7 +860,7 @@
         }
       }
 
-      setActive(this);
+      setActive(this, false);
     });
   });
 
