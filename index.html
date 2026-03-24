@@ -14,7 +14,6 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-
     <div class="nav2anchor">
       <a href="#kv">kv</a>
       <a href="#p1-1">p1-1</a>
@@ -33,7 +32,6 @@
       <a href="#p2-8">p2-8</a>
       <a href="#p2-9">p2-9</a>
     </div>
-    
 
     <section class="section section-kv section-index-kv" id="kv">
       <div class="container">
@@ -41,7 +39,7 @@
           <h1 class="main-title-l1">Smart Climate Control</h1>
           <p>Ready for any Architecture. Perfect for every Passenger.</p>
         </div>
-        <video width="250" muted autoplay loop playsinline preload="auto">
+        <video width="250" muted autoplay loop playsinline preload="metadata">
           <source
             src="video/ADCA-C80_Part_1-1_Car_n_Effects_v0113.webm"
             type="video/webm"
@@ -53,7 +51,6 @@
 
     <!-- part1 ================================================= -->
     <section class="section section-part1">
-      
       <!-- Made for every Vehicle -->
       <div class="container s1">
         <!-- title-list -->
@@ -106,22 +103,32 @@
               muted
               pause
               playsinline
-              preload="auto"
-              class="car-star"
+              preload="metadata"
+              data-src="video/ADCA-C80_Part_1-5_Particles_v0101.webm"
+              class="car-star lazy-video"
             >
-              <source
+              <!-- <source
                 src="video/ADCA-C80_Part_1-5_Particles_v0101.webm"
                 type="video/webm"
-              />
+              /> -->
             </video>
           </div>
           <div class="light-circle">
             <!-- <img src="images/light-circle.png" alt="" /> -->
-            <video width="250" muted autoplay loop playsinline preload="auto">
-              <source
+            <video
+              width="250"
+              muted
+              autoplay
+              loop
+              playsinline
+              data-src="video/ADCA-C80_Part_1-2_RingFX_v0101.webm"
+              preload="metadata"
+              class="lazy-video"
+            >
+              <!-- <source
                 src="video/ADCA-C80_Part_1-2_RingFX_v0101.webm"
                 type="video/webm"
-              />
+              /> -->
             </video>
           </div>
         </div>
@@ -316,9 +323,11 @@
         <div id="p1-6"></div>
       </div>
 
-
       <!-- 滿版標語 -->
-      <div class="container container-first-slogan gradient-effect style2" id="p1-6">
+      <div
+        class="container container-first-slogan gradient-effect style2"
+        id="p1-6"
+      >
         <div class="slogan">
           <div class="text-line">
             <span>EMPOWER</span>
@@ -352,16 +361,28 @@
           </p>
         </div>
         <div class="other-info">
-          <video muted playsinline preload="auto">
-            <source src="video/Part_2-1_UI.webm" type="video/webm" />
+          <video
+            muted
+            playsinline
+            preload="none"
+            data-src="video/Part_2-1_UI.webm"
+            class="lazy-video"
+          >
+            <!-- <source src="video/Part_2-1_UI.webm" type="video/webm" /> -->
           </video>
         </div>
         <div class="bg">
-          <video muted playsinline autoplay preload="auto">
-            <source
+          <video
+            muted
+            playsinline
+            preload="none"
+            data-src="video/Part_2-1_BG.webm"
+            class="lazy-video"
+          >
+            <!-- <source
               src="video/Part_2-1_BG.webm"
               type="video/webm"
-            />
+            /> -->
           </video>
         </div>
       </div>
@@ -380,13 +401,26 @@
           </p>
         </div>
         <div class="other-info">
-          <video muted playsinline preload="auto">
-            <source src="video/Part_2-2_UI.webm" type="video/webm" />
+          <video
+            muted
+            playsinline
+            preload="none"
+            data-src="video/Part_2-2_UI.webm"
+            class="lazy-video"
+          >
+            <!-- <source src="video/Part_2-2_UI.webm" type="video/webm" /> -->
           </video>
         </div>
         <div class="bg">
-          <video muted loop playsinline autoplay preload="auto">
-            <source src="video/Part_2-2_BG.webm" type="video/webm" />
+          <video
+            muted
+            loop
+            playsinline
+            preload="none"
+            data-src="video/Part_2-2_BG.webm"
+            class="lazy-video"
+          >
+            <!-- <source src="video/Part_2-2_BG.webm" type="video/webm" /> -->
           </video>
         </div>
       </div>
@@ -406,13 +440,26 @@
           </p>
         </div>
         <div class="other-info">
-          <video muted playsinline preload="auto">
-            <source src="video/Part_2-3_UI.webm" type="video/webm" />
+          <video
+            muted
+            playsinline
+            preload="none"
+            data-src="video/Part_2-3_UI.webm"
+            class="lazy-video"
+          >
+            <!-- <source src="video/Part_2-3_UI.webm" type="video/webm" /> -->
           </video>
         </div>
         <div class="bg">
-          <video muted loop playsinline autoplay preload="auto">
-            <source src="video/Part_2-3_BG.webm" type="video/webm" />
+          <video
+            muted
+            loop
+            playsinline
+            preload="none"
+            data-src="video/Part_2-3_BG.webm"
+            class="lazy-video"
+          >
+            <!-- <source src="video/Part_2-3_BG.webm" type="video/webm" /> -->
           </video>
         </div>
       </div>
@@ -431,13 +478,26 @@
           </p>
         </div>
         <div class="other-info">
-          <video muted playsinline preload="auto">
-            <source src="video/Part_2-4_UI.webm" type="video/webm" />
+          <video
+            muted
+            playsinline
+            preload="none"
+            data-src="video/Part_2-4_UI.webm"
+            class="lazy-video"
+          >
+            <!-- <source src="video/Part_2-4_UI.webm" type="video/webm" /> -->
           </video>
         </div>
         <div class="bg">
-          <video muted loop playsinline autoplay preload="auto">
-            <source src="video/Part_2-4_BG.webm" type="video/webm" />
+          <video
+            muted
+            loop
+            playsinline
+            preload="none"
+            data-src="video/Part_2-4_BG.webm"
+            class="lazy-video"
+          >
+            <!-- <source src="video/Part_2-4_BG.webm" type="video/webm" /> -->
           </video>
         </div>
       </div>
@@ -456,12 +516,26 @@
           </p>
         </div>
         <div class="other-info">
-          <video muted playsinline preload="auto">
-            <source src="video/Part_2-5_UI.webm" type="video/webm" />
+          <video
+            muted
+            playsinline
+            preload="none"
+            data-src="video/Part_2-5_UI.webm"
+            class="lazy-video"
+          >
+            <!-- <source src="video/Part_2-5_UI.webm" type="video/webm" /> -->
+          </video>
         </div>
         <div class="bg">
-          <video muted loop playsinline autoplay preload="auto">
-            <source src="video/Part_2-5_BG.webm" type="video/webm" />
+          <video
+            muted
+            loop
+            playsinline
+            preload="none"
+            data-src="video/Part_2-5_BG.webm"
+            class="lazy-video"
+          >
+            <!-- <source src="video/Part_2-5_BG.webm" type="video/webm" /> -->
           </video>
         </div>
       </div>
@@ -480,13 +554,26 @@
           </p>
         </div>
         <div class="other-info">
-          <video muted playsinline preload="auto">
-            <source src="video/Part_2-6_UI.webm" type="video/webm" />
+          <video
+            muted
+            playsinline
+            preload="none"
+            data-src="video/Part_2-6_UI.webm"
+            class="lazy-video"
+          >
+            <!-- <source src="video/Part_2-6_UI.webm" type="video/webm" /> -->
           </video>
         </div>
         <div class="bg">
-          <video muted loop playsinline autoplay preload="auto">
-            <source src="video/Part_2-6_BG.webm" type="video/webm" />
+          <video
+            muted
+            loop
+            playsinline
+            preload="none"
+            data-src="video/Part_2-6_BG.webm"
+            class="lazy-video"
+          >
+            <!-- <source src="video/Part_2-6_BG.webm" type="video/webm" /> -->
           </video>
         </div>
       </div>
@@ -505,8 +592,15 @@
           </p>
         </div>
         <div class="bg">
-          <video muted loop playsinline autoplay preload="auto">
-            <source src="video/Part_2-7_BG.webm" type="video/webm" />
+          <video
+            muted
+            loop
+            playsinline
+            preload="none"
+            data-src="video/Part_2-7_BG.webm"
+            class="lazy-video"
+          >
+            <!-- <source src="video/Part_2-7_BG.webm" type="video/webm" /> -->
           </video>
         </div>
       </div>
@@ -525,13 +619,23 @@
           </p>
         </div>
         <div class="bg">
-          <video muted loop playsinline autoplay preload="auto">
-            <source src="video/Part_2-8_BG.webm" type="video/webm" />
+          <video
+            muted
+            loop
+            playsinline
+            preload="none"
+            data-src="video/Part_2-8_BG.webm"
+            class="lazy-video"
+          >
+            <!-- <source src="video/Part_2-8_BG.webm" type="video/webm" /> -->
           </video>
         </div>
       </div>
       <!-- 最後一個畫面：大 slogan -->
-      <div class="container container-end-slogan gradient-effect style2" id="p2-9">
+      <div
+        class="container container-end-slogan gradient-effect style2"
+        id="p2-9"
+      >
         <div class="slogan">
           <div class="text-line">
             <span>25+</span>
