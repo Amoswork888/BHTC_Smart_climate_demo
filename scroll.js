@@ -167,6 +167,55 @@
   window.addEventListener("pointerdown", tryUnlockFromGesture, true);
 
   // =========
+  // Video Optimization: Intersection Observer
+  // =========
+  const videoOptions = {
+    root: null, // 以視窗作為容器
+    rootMargin: "0px 0px 500px 0px", // 提前 500px 觸發載入，適合 Local Assets
+    threshold: 0.1, // 影片露出 10% 時觸發
+  };
+
+  const lazyVideoObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const video = entry.target;
+      // 取得原本儲存在 data-src 的路徑 (HTML 需配合改動)
+      const dataSrc = video.getAttribute("data-src");
+
+      if (entry.isIntersecting) {
+        const video = entry.target;
+        const dataSrc = video.getAttribute("data-src");
+
+        // 檢查是否已經賦值過，避免重複 load()
+        if (dataSrc && !video.src.includes(dataSrc)) {
+          console.log("正在載入影片路徑:", dataSrc);
+          video.src = dataSrc;
+
+          // 關鍵：在賦予 src 後立即呼叫 load()，強制瀏覽器開始抓取 Local 檔案
+          video.load();
+
+          // 呼叫您現有的 safePlay
+          safePlay(video, {
+            requireGesture: true,
+            ensureMetadata: true,
+            playsInline: true,
+          }).then((ok) => {
+            if (!ok) console.error("影片播放被瀏覽器阻擋");
+          });
+        } else if (video.paused) {
+          // 如果已經有 src 但處於暫停狀態，則直接播放
+          video.play().catch(() => {});
+        }
+      }
+    });
+  }, videoOptions);
+
+  // 啟動監控（針對所有需要延遲載入的影片）
+  // 您可以在 HTML 給這些影片加上 class="lazy-video"
+  document.querySelectorAll("video.lazy-video").forEach((v) => {
+    lazyVideoObserver.observe(v);
+  });
+
+  // =========
   // Layout / scroll logic（保留原本）
   // =========
 
