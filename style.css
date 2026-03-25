@@ -1251,7 +1251,7 @@ section {
 /* 畫面控制小圓點 & section 錨點 */
 .nav2anchor {
   position: fixed;
-  right: 1.5em;
+  right: 2.5em;
   top: 0;
   bottom: 0;
   display: flex;
@@ -1286,6 +1286,7 @@ section {
       }
     }
   }
+  /* 顯示特定小圓點．但程式仍可對其作用 */
   a:nth-child(1),
   a:nth-child(2),
   a:nth-child(7),
@@ -1293,6 +1294,38 @@ section {
   a:nth-child(15),
   a:nth-child(16) {
     display: block;
+  }
+  /* 因為分成多個區段當成一個群組的概念，特定區段的小圓點具備 active 時，讓該區第一個小圓點亮起來 */
+  &:has(
+      a:nth-child(2).active,
+      a:nth-child(3).active,
+      a:nth-child(4).active,
+      a:nth-child(5).active,
+      a:nth-child(6).active
+    )
+    a:nth-child(2)::after {
+    background-color: #fff;
+    transform: scale(0.5);
+  }
+  &:has(
+      a:nth-child(7).active,
+      a:nth-child(8).active,
+      a:nth-child(9).active,
+      a:nth-child(10).active
+    )
+    a:nth-child(7)::after {
+    background-color: #fff;
+    transform: scale(0.5);
+  }
+  &:has(
+      a:nth-child(11).active,
+      a:nth-child(12).active,
+      a:nth-child(13).active,
+      a:nth-child(14).active
+    )
+    a:nth-child(11)::after {
+    background-color: #fff;
+    transform: scale(0.5);
   }
 }
 .anchor-list {
@@ -1308,6 +1341,7 @@ section {
   [id] {
     position: absolute;
   }
+
   #p1-1 {
     top: 0;
   }
