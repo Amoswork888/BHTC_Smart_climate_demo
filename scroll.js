@@ -171,40 +171,38 @@
   // =========
   const videoOptions = {
     root: null, // 以視窗作為容器
-    rootMargin: "0px 0px 500px 0px", // 提前 500px 觸發載入，適合 Local Assets
-    threshold: 0.1, // 影片露出 10% 時觸發
+    rootMargin: "0px 0px 200px 0px", // 提前 200px 觸發載入，適合 Local Assets
+    threshold: 0.3, // 影片露出 30% 時觸發
   };
 
   const lazyVideoObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       const video = entry.target;
-      // 取得原本儲存在 data-src 的路徑 (HTML 需配合改動)
-      const dataSrc = video.getAttribute("data-src");
+      const targetSrc = video.getAttribute("data-src");
 
       if (entry.isIntersecting) {
         const video = entry.target;
-        const dataSrc = video.getAttribute("data-src");
-
-        // 檢查是否已經賦值過，避免重複 load()
-        if (dataSrc && !video.src.includes(dataSrc)) {
-          console.log("正在載入影片路徑:", dataSrc);
-          video.src = dataSrc;
-
-          // 關鍵：在賦予 src 後立即呼叫 load()，強制瀏覽器開始抓取 Local 檔案
+        const targetSrc = video.getAttribute("data-src");
+        // 只有當目前的 src 真的不同時才賦值，避免重複觸發網路請求
+        if (targetSrc && (!video.src || !video.src.includes(targetSrc))) {
+          console.log("偵測到未載入或路徑不符，執行載入:", targetSrc);
+          video.src = targetSrc;
           video.load();
 
-          // 呼叫您現有的 safePlay
+          // 載入後執行播放邏輯
           safePlay(video, {
             requireGesture: true,
             ensureMetadata: true,
             playsInline: true,
-          }).then((ok) => {
-            if (!ok) console.error("影片播放被瀏覽器阻擋");
           });
         } else if (video.paused) {
           // 如果已經有 src 但處於暫停狀態，則直接播放
           video.play().catch(() => {});
         }
+        // ------------------------------
+      } else {
+        // 離開視窗僅暫停，不卸載以保持穩定
+        video.pause();
       }
     });
   }, videoOptions);
