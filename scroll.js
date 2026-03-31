@@ -171,7 +171,7 @@
   // =========
   const videoOptions = {
     root: null, // 以視窗作為容器
-    rootMargin: "0px 0px 200px 0px", // 提前 200px 觸發載入，適合 Local Assets
+    rootMargin: "0px 0px 400px 0px", // 提前 400px 觸發載入，適合 Local Assets
     threshold: 0.3, // 影片露出 30% 時觸發
   };
 
@@ -181,31 +181,86 @@
       const targetSrc = video.getAttribute("data-src");
 
       if (entry.isIntersecting) {
-        const video = entry.target;
-        const targetSrc = video.getAttribute("data-src");
-        // 只有當目前的 src 真的不同時才賦值，避免重複觸發網路請求
-        if (targetSrc && (!video.src || !video.src.includes(targetSrc))) {
-          console.log("偵測到未載入或路徑不符，執行載入:", targetSrc);
-          video.src = targetSrc;
-          video.load();
-
-          // 載入後執行播放邏輯
-          safePlay(video, {
-            requireGesture: true,
-            ensureMetadata: true,
-            playsInline: true,
-          });
-        } else if (video.paused) {
-          // 如果已經有 src 但處於暫停狀態，則直接播放
-          video.play().catch(() => {});
+        // 進入視窗：先清除之前的計時器（保險起見）
+        if (video._scrollTimeout) {
+          clearTimeout(video._scrollTimeout);
         }
-        // ------------------------------
+
+        // 設定 300 毫秒的延遲載入 (數值可依據您的 UX 需求調整，通常 200~400ms 效果最好)
+        video._scrollTimeout = setTimeout(() => {
+          // 倒數結束，確定影片還在畫面上且需要載入
+
+          if (video._isLoading) return;
+
+          if (
+            targetSrc &&
+            (!video.src || !video.src.includes(targetSrc) || video._loadError)
+          ) {
+            console.log("滑動停止，確實進入視窗，開始載入影片:", targetSrc);
+
+            video._isLoading = true;
+            video._loadError = false;
+            video.style.transition = "none";
+            video.style.opacity = "0";
+
+            video.src = targetSrc;
+
+            const onCanPlay = () => {
+              video.style.transition = "opacity 0.5s ease";
+              video.style.opacity = "1";
+              video.removeEventListener("canplay", onCanPlay);
+            };
+            video.addEventListener("canplay", onCanPlay);
+
+            const onError = () => {
+              console.warn("影片載入失敗，隱藏並等待下次重試:", targetSrc);
+              video._isLoading = false;
+              video._loadError = true;
+              video.style.opacity = "0";
+              video.removeEventListener("error", onError);
+            };
+            video.addEventListener("error", onError, { once: true });
+
+            video.load();
+
+            safePlay(video, {
+              requireGesture: true,
+              ensureMetadata: true,
+              playsInline: true,
+            })
+              .then(() => {
+                video._isLoading = false;
+              })
+              .catch(() => {
+                video._isLoading = false;
+              });
+          } else if (video.paused && !video._loadError) {
+            video.play().catch(() => {});
+          }
+        }, 300); // 等待滑動停止的時間 (300毫秒)
       } else {
-        // 離開視窗僅暫停，不卸載以保持穩定
+        // 離開視窗
+        // 如果倒數計時還沒結束（代表使用者只是快速滑過），就立刻取消載入計畫
+        if (video._scrollTimeout) {
+          clearTimeout(video._scrollTimeout);
+          video._scrollTimeout = null;
+        }
+
+        // 離開視窗時，瞬間隱藏影片，避免快速捲動時看到殘影
+        video.style.transition = "none";
+        video.style.opacity = "0";
+        // 如果影片已經在播放，則將其暫停
         video.pause();
       }
     });
   }, videoOptions);
+
+  // 啟動監控（針對所有需要延遲載入的影片）
+  document.querySelectorAll("video.lazy-video").forEach((v) => {
+    // 確保初始狀態是隱藏的，避免畫面閃爍
+    v.style.opacity = "0";
+    lazyVideoObserver.observe(v);
+  });
 
   // 啟動監控（針對所有需要延遲載入的影片）
   // 您可以在 HTML 給這些影片加上 class="lazy-video"
