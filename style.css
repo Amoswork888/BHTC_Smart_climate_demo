@@ -82,6 +82,11 @@ section {
   }
 }
 
+.lazy-video {
+  opacity: 0;
+  background-color: transparent !important;
+}
+
 .back-to-top {
   opacity: 0;
   position: fixed;
