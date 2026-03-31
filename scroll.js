@@ -181,25 +181,24 @@
       const targetSrc = video.getAttribute("data-src");
 
       if (entry.isIntersecting) {
-        // 進入視窗：先清除之前的計時器（保險起見）
         if (video._scrollTimeout) {
           clearTimeout(video._scrollTimeout);
         }
 
-        // 設定 300 毫秒的延遲載入 (數值可依據您的 UX 需求調整，通常 200~400ms 效果最好)
         video._scrollTimeout = setTimeout(() => {
-          // 倒數結束，確定影片還在畫面上且需要載入
-
           if (video._isLoading) return;
 
+          // 情況 A：需要重新載入（沒 src、路徑不符、或曾經報錯）
           if (
             targetSrc &&
             (!video.src || !video.src.includes(targetSrc) || video._loadError)
           ) {
-            console.log("滑動停止，確實進入視窗，開始載入影片:", targetSrc);
+            console.log("確實進入視窗，開始載入影片:", targetSrc);
 
             video._isLoading = true;
             video._loadError = false;
+
+            // 只有「重新載入」時，才需要先透明隱藏，避免看到舊殘影或破圖
             video.style.transition = "none";
             video.style.opacity = "0";
 
@@ -234,22 +233,34 @@
               .catch(() => {
                 video._isLoading = false;
               });
+
+            // 情況 B：已經有 src，準備喚醒播放
           } else if (video.paused && !video._loadError) {
-            video.play().catch(() => {});
+            // 【修正 1】：確保影片是顯示狀態
+            video.style.transition = "opacity 0.3s ease";
+            video.style.opacity = "1";
+
+            // 【修正 2】：攔截 Android 資源回收導致的播放失敗
+            video.play().catch((e) => {
+              console.warn(
+                "喚醒播放失敗 (解碼器可能被系統回收)，準備重載:",
+                targetSrc,
+                e,
+              );
+              // 將狀態標示為錯誤，下一次進入視窗 (或稍微捲動一下) 就會觸發情況 A 重新載入
+              video._loadError = true;
+              video.style.opacity = "0";
+            });
           }
-        }, 300); // 等待滑動停止的時間 (300毫秒)
+        }, 300);
       } else {
         // 離開視窗
-        // 如果倒數計時還沒結束（代表使用者只是快速滑過），就立刻取消載入計畫
         if (video._scrollTimeout) {
           clearTimeout(video._scrollTimeout);
           video._scrollTimeout = null;
         }
 
-        // 離開視窗時，瞬間隱藏影片，避免快速捲動時看到殘影
-        video.style.transition = "none";
-        video.style.opacity = "0";
-        // 如果影片已經在播放，則將其暫停
+        // 【修正 3】：移除 opacity = "0"，讓已載入的影片保持顯示，僅暫停播放
         video.pause();
       }
     });
