@@ -8,6 +8,7 @@
 html,
 body {
   scroll-behavior: smooth;
+  min-height: 100lvh;
 }
 /* .roboto-<uniquifier > {
   font-family: "Roboto", sans-serif;
@@ -29,6 +30,13 @@ body {
   --slogan-font-size: 7.5vw;
   --slogan-color: #eafbff;
 }
+
+.footer-bar {
+  /* 使用 env(safe-area-inset-bottom) 自動取得手勢桿的高度 */
+  /* padding-bottom: env(safe-area-inset-bottom); */
+  /* background-color: #ffffff; */
+}
+
 /* 定義一個自定義變數，並指定類型為整數，給跑百分比的動畫物件使用 */
 @property --percent {
   syntax: "<integer>";
@@ -61,7 +69,7 @@ section {
 .scroll-icon {
   position: fixed;
   z-index: 10;
-  width: 100px;
+  width: 5vw;
   bottom: 3vh;
   left: 0;
   right: 0;
@@ -80,6 +88,10 @@ section {
   100% {
     transform: translateY(-10%);
   }
+}
+
+.section-part2:has(.container-end-slogan.active) ~ .scroll-icon {
+  display: none !important;
 }
 
 .lazy-video {
@@ -106,6 +118,26 @@ section {
     opacity: 1;
     pointer-events: auto;
   }
+}
+
+/* 設定每個 section 的背景圖以避免影片沒有出現時的黑底問題 */
+#p2-2,
+#p2-4,
+#p2-5 {
+  background: url(./images/ADCA-C80_Part_2-5_PicBG_v0102.png) no-repeat center
+    center / cover;
+}
+#p2-3 {
+  background: url(./images/ADCA-C80_Part_2-3_PicBG_v0102.png) no-repeat center
+    center / cover;
+}
+#p2-6 {
+  background: url(./images/ADCA-C80_Part_2-6_PicBG_v0102.png) no-repeat center
+    center / cover;
+}
+#p2-7 {
+  background: url(./images/ADCA-C80_Part_2-7_PicBG_v0102.png) no-repeat center
+    center / cover;
 }
 
 /* KV ==================================================== */
